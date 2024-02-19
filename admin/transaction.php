@@ -1,4 +1,4 @@
-<?php include '../connection.php' ?>
+<?php include '../connection.php'; ?>
 
 <!doctype html>
 
@@ -25,28 +25,7 @@
                 Transaction
               </h2>
             </div>
-            <!-- Page title actions -->
-            <div class="col-auto ms-auto d-print-none">
-              <div class="btn-list">
-                <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-report">
-                  <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 5l0 14" />
-                    <path d="M5 12l14 0" />
-                  </svg>
-                  Create new report
-                </a>
-                <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
-                  <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 5l0 14" />
-                    <path d="M5 12l14 0" />
-                  </svg>
-                </a>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
@@ -70,12 +49,37 @@
                       <tr>
                         <th>
                           <button class="table-sort" data-sort="sort-id">
-                            #
+                            Transaction No #
                           </button>
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-department">
-                            Department
+                            Borrower Name
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-department">
+                            Item Name
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Quantity
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Start Date
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Expected Returned Date
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Return Status
                           </button>
                         </th>
                         <th>
@@ -92,48 +96,89 @@
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_department order by department_id asc";
+                      $sql = "SELECT
+                        CONCAT(c.last_name,', ',c.first_name, ' ',LEFT(C.middle_name,1)) as fname,
+                        a.transaction_no,
+                        a.item_code,
+                        b.item_name,
+                        a.quantity,
+                        a.start_date,
+                        a.return_date,
+                        a.status
+                    FROM
+                        tbl_transaction a
+                    INNER JOIN tbl_inventory b ON
+                        a.item_code = b.item_code
+                    INNER JOIN tbl_borrower c ON
+                      a.borrower_id = c.borrower_id
+                    ORDER BY
+                        a.date_created ASC";
                       $rs = $conn->query($sql);
-                      $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $i++ ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['department_name'] ?></td>
+                          <td class="sort-id"><?php echo $row['transaction_no'] ?></td>
+                          <td class="sort-id"><?php echo $row['fname'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
+                          <td class="sort-department text-capitalize">
+                            <?php
+                            if ($row['start_date'] == null) {
+                              echo '-';
+                            } else {
+                              echo $row['start_date'];
+                            }
+
+                            ?>
+                          </td>
+                          <td class="sort-returnedate text-capitalize">
+                            <?php echo $row['return_date']; ?>
+                          </td>
+                          <td><?php
+                              $date = date('Y-m-d');
+                              if ($date < $row['start_date'] || $date > $row['return_date']) {
+                                echo '<span class="badge bg-danger text-white">Overdue</span>';
+                              } else if ($row['start_date'] == null) {
+                                echo '<span class="badge bg-secondary text-white">Undetermined</span>';
+                              }else{
+                                echo '<span class="badge bg-success text-white">On Due Date</span>';
+                              }
+                              ?>
+                              </td>
                           <td class="sort-status">
                             <?php
-                            if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-green-lt text-uppercase ms-auto">Active</span>';
+                            if ($row['status'] == 0) {
+                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
+                            } else if ($row['status'] == 1) {
+                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
                             } else if ($row['status'] == 2) {
-                              echo '<span class="badge badge-sm bg-red-lt text-uppercase ms-auto">Inactive</span>';
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
+                            } else if ($row['status'] == 3) {
+                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
+                            } else if ($row['status'] == 4) {
+                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">Rejected</span>';
+                            } else {
+                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
                             }
                             ?>
-
                           </td>
                           <td>
-                            <a href="#" class="badge bg-yellow edit">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
-                                <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
-                              </svg>
-
-                            </a> |
-                            <a href="#" class="badge bg-red delete">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 7h16" />
-                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                <path d="M10 12l4 4m0 -4l-4 4" />
-                              </svg>
-                            </a>
+                            <?php
+                            if ($row['status'] == 1 || $row['status'] == 2) {
+                              echo '<a href="#" class="badge bg-info edit text-decoration-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up-double" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 14l-4 -4l4 -4" /><path d="M8 14l-4 -4l4 -4" /><path d="M9 10h7a4 4 0 1 1 0 8h-1" /></svg></a>';
+                            } else if ($row['status'] == 3) {
+                              echo '<a href="#" class="badge bg-info receive   text-decoration-none" title="Receive"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hand-grab" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 11v-3.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M11 9.5v-3a1.5 1.5 0 0 1 3 0v3.5" /><path d="M14 7.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M17 9.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" /></svg></a>';
+                            } else if ($row['status'] == 5) {
+                              echo '<a href="#" class="badge bg-success approved text-decoration-none" title="Approved">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-up-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 3a3 3 0 0 1 2.995 2.824l.005 .176v4h2a3 3 0 0 1 2.98 2.65l.015 .174l.005 .176l-.02 .196l-1.006 5.032c-.381 1.626 -1.502 2.796 -2.81 2.78l-.164 -.008h-8a1 1 0 0 1 -.993 -.883l-.007 -.117l.001 -9.536a1 1 0 0 1 .5 -.865a2.998 2.998 0 0 0 1.492 -2.397l.007 -.202v-1a3 3 0 0 1 3 -3z" stroke-width="0" fill="currentColor" /><path d="M5 10a1 1 0 0 1 .993 .883l.007 .117v9a1 1 0 0 1 -.883 .993l-.117 .007h-1a2 2 0 0 1 -1.995 -1.85l-.005 -.15v-7a2 2 0 0 1 1.85 -1.995l.15 -.005h1z" stroke-width="0" fill="currentColor" /></svg>
+                              </a> | 
+                              <a href="#" class="badge bg-danger reject text-decoration-none" title="Reject">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-down-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 21.008a3 3 0 0 0 2.995 -2.823l.005 -.177v-4h2a3 3 0 0 0 2.98 -2.65l.015 -.173l.005 -.177l-.02 -.196l-1.006 -5.032c-.381 -1.625 -1.502 -2.796 -2.81 -2.78l-.164 .008h-8a1 1 0 0 0 -.993 .884l-.007 .116l.001 9.536a1 1 0 0 0 .5 .866a2.998 2.998 0 0 1 1.492 2.396l.007 .202v1a3 3 0 0 0 3 3z" stroke-width="0" fill="currentColor" /><path d="M5 14.008a1 1 0 0 0 .993 -.883l.007 -.117v-9a1 1 0 0 0 -.883 -.993l-.117 -.007h-1a2 2 0 0 0 -1.995 1.852l-.005 .15v7a2 2 0 0 0 1.85 1.994l.15 .005h1z" stroke-width="0" fill="currentColor" /></svg>
+                              </a>';
+                            }
+                            ?>
                           </td>
                         </tr>
-
                       <?php } ?>
-
-
                     </tbody>
                   </table>
                   <br>
@@ -151,9 +196,203 @@
       <?php include '../components/footer.php' ?>
     </div>
   </div>
+  <?php include '../components/modal.php' ?>
 
   <?php include '../components/script.php' ?>
 
 </body>
 
 </html>
+<script>
+  $(document).ready(function() {
+    let id = 0;
+    $(document).on('click', '.add', function() {
+      $('#modal-department').modal('show');
+      $('.md-title').html('Insert Department');
+      $('.my-switch').css('display', 'none');
+      $('#departmentName').val('');
+    });
+
+    $(document).on('click', '.edit', function() {
+      var currentRow = $(this).closest("tr");
+      let stat = '';
+      $tr = $(this).closest('tr');
+      var data = $tr.children("td").map(function() {
+        return $(this).text();
+      }).get();
+      if (data[5] == 1) {
+        stat = 'checked'
+      } else {
+        stat = ''
+      }
+      id = data[4];
+      $('#modal-department').modal('show');
+      $('#departmentName').val(data[1])
+      $('.md-title').html('Update Department');
+      $('.my-switch').css('display', 'block');
+      $('#departmentStatus').prop('checked', stat);
+    });
+
+
+
+    $(document).on('click', '#submit', function(e) {
+      e.preventDefault();
+      let checkStatus = 0;
+      var description = $('#departmentName').val();
+      var status = $('#departmentStatus').prop('checked');
+      if (status) {
+        checkStatus = 1;
+      } else {
+        checkStatus = 0;
+      }
+      swal({
+          title: "Are you sure?",
+          text: "You want to add this data?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            if (id === 0) {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/department.php",
+                data: {
+                  description: description,
+                  action: 'ADD'
+                },
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            } else {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/department.php",
+                data: {
+                  id: id,
+                  description: description,
+                  status: checkStatus,
+                  action: 'UPDATE'
+                },
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            }
+
+          }
+        });
+    });
+
+
+
+    //  APPROVED
+    $(document).on('click', '.approved', function(e) {
+      e.preventDefault();
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(0)").text();
+      swal({
+          title: "Are you sure?",
+          text: "You want to approved this transaction?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                transid: col1,
+                action: 'APPROVED'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
+          }
+        });
+    });
+
+    // REJECT
+    $(document).on('click', '.reject', function(e) {
+      e.preventDefault();
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(0)").text();
+      swal({
+          title: "Are you sure?",
+          text: "You want to reject this transaction?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                transid: col1,
+                action: 'REJECT'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
+          }
+        });
+    });
+
+
+    $(document).on('click', '.receive', function(e) {
+      e.preventDefault();
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(0)").text();
+      swal({
+          title: "Are you sure?",
+          text: "This can't be undo this action?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                transid: col1,
+                action: 'RECEIVE'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
+          }
+        });
+    });
+  });
+</script>

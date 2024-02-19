@@ -25,7 +25,7 @@
                 Transaction
               </h2>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -49,12 +49,27 @@
                       <tr>
                         <th>
                           <button class="table-sort" data-sort="sort-id">
-                            #
+                            Transaction No #
                           </button>
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-department">
-                            Department
+                            Item Name
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Quantity
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Start Date
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Returned Date
                           </button>
                         </th>
                         <th>
@@ -67,25 +82,59 @@
                             Action
                           </button>
                         </th>
-                        <th class="d-none"></th>
-                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_department order by department_id asc";
+                      $sql = "SELECT
+                       a.transaction_no,
+                       a.item_code,
+                       b.item_name,
+                       a.quantity,
+                       a.start_date,
+                       a.return_date,
+                       a.status
+                   FROM
+                       tbl_transaction a
+                   INNER JOIN tbl_inventory b ON
+                       a.item_code = b.item_code
+                   ORDER BY
+                       a.date_created ASC";
                       $rs = $conn->query($sql);
-                      $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $i++ ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['department_name'] ?></td>
+                          <td class="sort-id"><?php echo $row['transaction_no'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
+                          <td class="sort-department text-capitalize">
+                            <?php
+                            if ($row['start_date'] == null) {
+                              echo '-';
+                            } else {
+                              echo $row['start_date'];
+                            }
+
+                            ?>
+                          </td>
+                          <td class="sort-returnedate text-capitalize">
+                            <?php
+                            echo $row['return_date'];
+                            ?>
+                          </td>
                           <td class="sort-status">
                             <?php
-                            if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
-                            } else if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
+                            if ($row['status'] == 0) {
+                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
+                            } else if ($row['status'] == 1) {
+                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Inactive</span>';
+                            }else if ($row['status'] == 2) {
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
+                            }else if ($row['status'] == 3) {
+                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
+                            }else if ($row['status'] == 4) {
+                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">Rejected</span>';
+                            }else{
+                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
                             }
                             ?>
                           </td>
@@ -109,8 +158,6 @@
                               </svg>
                             </a>
                           </td>
-                          <td class="d-none"><?php echo $row['department_id'] ?></td>
-                          <td class="d-none"><?php echo $row['status'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
@@ -229,37 +276,6 @@
     });
 
 
-    $(document).on('click', '.update', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to update this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "PUT",
-              url: "../ajax/department.php",
-              data: {
-                id: col1,
-                action: 'UPDATE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
-    });
 
 
     $(document).on('click', '.delete', function(e) {

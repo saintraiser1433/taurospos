@@ -242,37 +242,6 @@
     });
 
 
-    $(document).on('click', '.update', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to update this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "PUT",
-              url: "../ajax/department.php",
-              data: {
-                id: col1,
-                action: 'UPDATE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
-    });
 
 
     $(document).on('click', '.delete', function(e) {
