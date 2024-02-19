@@ -1,4 +1,4 @@
-<?php include '../connection.php'; ?>
+<?php include '../connection.php' ?>
 
 <!doctype html>
 
@@ -22,20 +22,19 @@
                 Overview
               </div>
               <h2 class="page-title">
-                Department
+                Returned Items
               </h2>
             </div>
             <!-- Page title actions -->
             <div class="col-auto ms-auto d-print-none">
               <div class="btn-list">
-                <a href="#" class="btn btn-primary d-none d-sm-inline-block add">
+                <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
                   <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new department
                 </a>
               </div>
             </div>
@@ -67,21 +66,29 @@
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-department">
-                            Department
+                            Item Name
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-department">
+                            Size
                           </button>
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-status">
-                            Status
+                            Quantity
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort">
-                            Action
+                          <button class="table-sort" data-sort="sort-status">
+                            Returned By
                           </button>
                         </th>
-                        <th class="d-none"></th>
-                        <th class="d-none"></th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Returned Date
+                          </button>
+                        </th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
@@ -96,11 +103,12 @@
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
-                            } else if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
+                              echo '<span class="badge badge-sm bg-green-lt text-uppercase ms-auto">Active</span>';
+                            } else if ($row['status'] == 2) {
+                              echo '<span class="badge badge-sm bg-red-lt text-uppercase ms-auto">Inactive</span>';
                             }
                             ?>
+
                           </td>
                           <td>
                             <a href="#" class="badge bg-yellow edit">
@@ -122,10 +130,11 @@
                               </svg>
                             </a>
                           </td>
-                          <td class="d-none"><?php echo $row['department_id'] ?></td>
-                          <td class="d-none"><?php echo $row['status'] ?></td>
                         </tr>
+
                       <?php } ?>
+
+
                     </tbody>
                   </table>
                   <br>
@@ -143,168 +152,9 @@
       <?php include '../components/footer.php' ?>
     </div>
   </div>
-  <?php include '../components/modal.php' ?>
 
   <?php include '../components/script.php' ?>
 
 </body>
 
 </html>
-<script>
-  $(document).ready(function() {
-    let id = 0;
-    $(document).on('click', '.add', function() {
-      $('#modal-department').modal('show');
-      $('.md-title').html('Insert Department');
-      $('.my-switch').css('display', 'none');
-      $('#departmentName').val('');
-    });
-
-    $(document).on('click', '.edit', function() {
-      var currentRow = $(this).closest("tr");
-      let stat = '';
-      $tr = $(this).closest('tr');
-      var data = $tr.children("td").map(function() {
-        return $(this).text();
-      }).get();
-      if (data[5] == 1) {
-        stat = 'checked'
-      } else {
-        stat = ''
-      }
-      id = data[4];
-      $('#modal-department').modal('show');
-      $('#departmentName').val(data[1])
-      $('.md-title').html('Update Department');
-      $('.my-switch').css('display', 'block');
-      $('#departmentStatus').prop('checked', stat);
-    });
-
-
-
-    $(document).on('click', '#submit', function(e) {
-      e.preventDefault();
-      let checkStatus = 0;
-      var description = $('#departmentName').val();
-      var status = $('#departmentStatus').prop('checked');
-      if (status) {
-        checkStatus = 1;
-      } else {
-        checkStatus = 0;
-      }
-      swal({
-          title: "Are you sure?",
-          text: "You want to add this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            if (id === 0) {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  description: description,
-                  action: 'ADD'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            } else {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  id: id,
-                  description: description,
-                  status: checkStatus,
-                  action: 'UPDATE'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            }
-
-          }
-        });
-    });
-
-
-    $(document).on('click', '.update', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to update this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "PUT",
-              url: "../ajax/department.php",
-              data: {
-                id: col1,
-                action: 'UPDATE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
-    });
-
-
-    $(document).on('click', '.delete', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to delete this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/department.php",
-              data: {
-                id: col1,
-                action: 'DELETE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
-    });
-  });
-</script>

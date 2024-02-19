@@ -1,4 +1,6 @@
-<?php include '../connection.php'; ?>
+<?php include '../connection.php';
+$trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
+?>
 
 <!doctype html>
 
@@ -22,7 +24,7 @@
                 Overview
               </div>
               <h2 class="page-title">
-                Department
+                Inventory Panel
               </h2>
             </div>
             <!-- Page title actions -->
@@ -35,7 +37,7 @@
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new department
+                  Create new item
                 </a>
               </div>
             </div>
@@ -66,8 +68,33 @@
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-department">
-                            Department
+                          <button class="table-sort" data-sort="sort-inventory">
+                            Item Code
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Item Name
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Category Name
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Qty
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Size
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Condition
                           </button>
                         </th>
                         <th>
@@ -80,27 +107,48 @@
                             Action
                           </button>
                         </th>
-                        <th class="d-none"></th>
-                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_department order by department_id asc";
+                      $sql = "SELECT
+                      a.item_code,
+                      a.item_name,
+                      b.category_name,
+                      a.quantity,
+                      c.size_description,
+                      a.item_condition,
+                      a.status,
+                      a.img_path
+                  FROM
+                      tbl_inventory a
+                  LEFT JOIN tbl_categories b ON
+                      a.category_id = b.category_id AND b.status = 1
+                  LEFT JOIN tbl_size c ON
+                      a.size_id = c.size_id
+                  ORDER BY
+                      a.item_code ASC";
                       $rs = $conn->query($sql);
                       $i = 1;
+
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $i++ ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['department_name'] ?></td>
+                          <td><img src="../static/item/<?php echo $row['img_path'] ?>" class="rounded-circle" style="width:30px;height:30px;"></td>
+                          <td class="sort-id"><?php echo $row['item_code'] ?></td>
+                          <td class="sort-inventory text-capitalize"><?php echo $row['item_name'] ?></td>
+                          <td class="sort-inventory text-capitalize"><?php echo $row['category_name'] ?></td>
+                          <td class="sort-inventory"><?php echo $row['quantity'] ?></td>
+                          <td class="sort-inventory"><?php echo $row['size_description'] ?></td>
+                          <td class="sort-inventory"><?php echo $row['item_condition'] ?></td>
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
                               echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
-                            } else if ($row['status'] == 0) {
+                            } else if ($row['status'] == 2) {
                               echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
                             }
                             ?>
+
                           </td>
                           <td>
                             <a href="#" class="badge bg-yellow edit">
@@ -122,15 +170,13 @@
                               </svg>
                             </a>
                           </td>
-                          <td class="d-none"><?php echo $row['department_id'] ?></td>
-                          <td class="d-none"><?php echo $row['status'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
                   </table>
                   <br>
                   <div class="btn-toolbar">
-                    <p class="mb-0" id="listjs-showing-items-label">Showing 0 items</p>
+                    <p class="mb-0" id="listjs-showing-items-label">Showing <?php echo $rs->num_rows ?> items</p>
                     <ul class="pagination ms-auto mb-0"></ul>
                   </div>
                 </div>
@@ -144,20 +190,36 @@
     </div>
   </div>
   <?php include '../components/modal.php' ?>
-
   <?php include '../components/script.php' ?>
 
 </body>
 
 </html>
+
 <script>
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $('#ImgID').attr('src', e.target.result);
+
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
   $(document).ready(function() {
-    let id = 0;
+    let id = null;
     $(document).on('click', '.add', function() {
-      $('#modal-department').modal('show');
-      $('.md-title').html('Insert Department');
-      $('.my-switch').css('display', 'none');
-      $('#departmentName').val('');
+      $('#modal-inventory').modal('show');
+      id = null;
+      $('.md-title').html('Insert Item');
+      $('#itemCode').val('<?php echo $trn ?>')
+      $('#itemName').val('')
+      $('#itemDescription').val('')
+      $('#itemCategory').val('')
+      $('#itemCondition').val('')
+      $('#itemQty').val('')
+      $('#itemSize').val('')
     });
 
     $(document).on('click', '.edit', function() {
@@ -167,30 +229,50 @@
       var data = $tr.children("td").map(function() {
         return $(this).text();
       }).get();
-      if (data[5] == 1) {
-        stat = 'checked'
-      } else {
-        stat = ''
-      }
-      id = data[4];
-      $('#modal-department').modal('show');
-      $('#departmentName').val(data[1])
-      $('.md-title').html('Update Department');
-      $('.my-switch').css('display', 'block');
-      $('#departmentStatus').prop('checked', stat);
+      id = data[1];
+      $('#modal-inventory').modal('show');
+      $('.md-title').html('Update Item');
+      $.ajax({
+        method: "GET",
+        url: "../ajax/inventory.php",
+        data: {
+          itemCode: id,
+          action: 'GET'
+        },
+        dataType:'json',
+        success: function(res) {
+          const html = res[0];
+          $('#itemCode').val(html.item_code)
+          $('#itemName').val(html.item_name)
+          $('#itemDescription').val(html.description)
+          $('#itemCategory').val(html.category_id)
+          $('#itemCondition').val(html.item_condition)
+          $('#itemQty').val(html.quantity)
+          $('#itemSize').val(html.size_id)
+          $('#ImgID').attr('src',`../static/item/${html.img_path}`)
+        }
+      });
+
     });
 
 
 
     $(document).on('click', '#submit', function(e) {
       e.preventDefault();
-      let checkStatus = 0;
-      var description = $('#departmentName').val();
-      var status = $('#departmentStatus').prop('checked');
-      if (status) {
-        checkStatus = 1;
-      } else {
-        checkStatus = 0;
+      var fileInput = document.getElementById('filer_input_single');
+      var formData = new FormData();
+      formData.append('itemCode', $('#itemCode').val());
+      formData.append('itemName', $('#itemName').val());
+      formData.append('itemDescription', $('#itemDescription').val());
+      formData.append('itemCategory', $('#itemCategory').val());
+      formData.append('itemCondition', $('#itemCondition').val());
+      formData.append('itemQty', $('#itemQty').val());
+      formData.append('itemSize', $('#itemSize').val());
+      formData.append('files', fileInput.files[0]);
+      if(id === null){
+        formData.append('action', 'ADD');
+      }else{
+        formData.append('action', 'UPDATE');
       }
       swal({
           title: "Are you sure?",
@@ -201,14 +283,14 @@
         })
         .then((isConfirm) => {
           if (isConfirm) {
-            if (id === 0) {
+            if (id === null) {
               $.ajax({
                 method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  description: description,
-                  action: 'ADD'
-                },
+                url: "../ajax/inventory.php",
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
                 success: function(html) {
                   swal("Success", {
                     icon: "success",
@@ -220,13 +302,11 @@
             } else {
               $.ajax({
                 method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  id: id,
-                  description: description,
-                  status: checkStatus,
-                  action: 'UPDATE'
-                },
+                url: "../ajax/inventory.php",
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
                 success: function(html) {
                   swal("Success", {
                     icon: "success",
@@ -257,7 +337,7 @@
           if (isConfirm) {
             $.ajax({
               method: "PUT",
-              url: "../ajax/department.php",
+              url: "../ajax/inventory.php",
               data: {
                 id: col1,
                 action: 'UPDATE'
@@ -290,7 +370,7 @@
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/department.php",
+              url: "../ajax/inventory.php",
               data: {
                 id: col1,
                 action: 'DELETE'

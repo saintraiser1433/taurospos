@@ -1,4 +1,4 @@
-<?php include '../connection.php'; ?>
+<?php include '../connection.php' ?>
 
 <!doctype html>
 
@@ -22,20 +22,20 @@
                 Overview
               </div>
               <h2 class="page-title">
-                Department
+                Borrower Panel
               </h2>
             </div>
             <!-- Page title actions -->
             <div class="col-auto ms-auto d-print-none">
               <div class="btn-list">
-                <a href="#" class="btn btn-primary d-none d-sm-inline-block add">
+
+                <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
                   <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new department
                 </a>
               </div>
             </div>
@@ -62,17 +62,32 @@
                       <tr>
                         <th>
                           <button class="table-sort" data-sort="sort-id">
-                            #
+                            Borrower ID
                           </button>
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-department">
+                            Full Name
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-department">
+                            Type
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
                             Department
                           </button>
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-status">
-                            Status
+                            Phone
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            File
                           </button>
                         </th>
                         <th>
@@ -80,50 +95,64 @@
                             Action
                           </button>
                         </th>
-                        <th class="d-none"></th>
-                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_department order by department_id asc";
+                      $sql = "SELECT
+                      CONCAT(
+                          a.first_name,
+                          ', ',
+                          a.last_name,
+                          ' ',
+                          LEFT(a.middle_name, 1)
+                      ) AS fname,
+                      a.type,
+                      a.status,
+                      a.phone_number,
+                      a.docs_file,
+                      a.borrower_id,
+                      b.department_name
+                  FROM
+                      tbl_borrower a
+                  LEFT JOIN tbl_department b ON
+                      a.department_id = b.department_id
+                  WHERE a.status = 0 and a.status_approval = 0
+                  ORDER BY
+                      a.department_id ASC";
                       $rs = $conn->query($sql);
                       $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $i++ ?></td>
+                          <td class="sort-id"><?php echo $row['borrower_id'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['fname'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['type'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['department_name'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['phone_number'] ?></td>
                           <td class="sort-status">
-                            <?php
-                            if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
-                            } else if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
-                            }
-                            ?>
+                            <span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Link</span>
+
                           </td>
                           <td>
-                            <a href="#" class="badge bg-yellow edit">
+                            <a href="#" class="badge bg-green edit">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
-                                <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
+                                <path d="M3 16m0 1a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1z" />
+                                <path d="M6 20a1 1 0 0 0 1 1h3.756a1 1 0 0 0 .958 -.713l1.2 -3c.09 -.303 .133 -.63 -.056 -.884c-.188 -.254 -.542 -.403 -.858 -.403h-2v-2.467a1.1 1.1 0 0 0 -2.015 -.61l-1.985 3.077v4z" />
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                <path d="M5 12.1v-7.1a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-2.3" />
                               </svg>
-
                             </a> |
                             <a href="#" class="badge bg-red delete">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 7h16" />
-                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                <path d="M10 12l4 4m0 -4l-4 4" />
+                                <path d="M3 14m0 1a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1z" />
+                                <path d="M6 15a1 1 0 0 1 1 -1h3.756a1 1 0 0 1 .958 .713l1.2 3c.09 .303 .133 .63 -.056 .884c-.188 .254 -.542 .403 -.858 .403h-2v2.467a1.1 1.1 0 0 1 -2.015 .61l-1.985 -3.077v-4z" />
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                <path d="M5 11v-6a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-2.5" />
                               </svg>
                             </a>
                           </td>
-                          <td class="d-none"><?php echo $row['department_id'] ?></td>
-                          <td class="d-none"><?php echo $row['status'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
@@ -143,112 +172,22 @@
       <?php include '../components/footer.php' ?>
     </div>
   </div>
-  <?php include '../components/modal.php' ?>
 
   <?php include '../components/script.php' ?>
 
 </body>
 
 </html>
+
 <script>
   $(document).ready(function() {
-    let id = 0;
-    $(document).on('click', '.add', function() {
-      $('#modal-department').modal('show');
-      $('.md-title').html('Insert Department');
-      $('.my-switch').css('display', 'none');
-      $('#departmentName').val('');
-    });
-
-    $(document).on('click', '.edit', function() {
-      var currentRow = $(this).closest("tr");
-      let stat = '';
-      $tr = $(this).closest('tr');
-      var data = $tr.children("td").map(function() {
-        return $(this).text();
-      }).get();
-      if (data[5] == 1) {
-        stat = 'checked'
-      } else {
-        stat = ''
-      }
-      id = data[4];
-      $('#modal-department').modal('show');
-      $('#departmentName').val(data[1])
-      $('.md-title').html('Update Department');
-      $('.my-switch').css('display', 'block');
-      $('#departmentStatus').prop('checked', stat);
-    });
-
-
-
-    $(document).on('click', '#submit', function(e) {
-      e.preventDefault();
-      let checkStatus = 0;
-      var description = $('#departmentName').val();
-      var status = $('#departmentStatus').prop('checked');
-      if (status) {
-        checkStatus = 1;
-      } else {
-        checkStatus = 0;
-      }
-      swal({
-          title: "Are you sure?",
-          text: "You want to add this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            if (id === 0) {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  description: description,
-                  action: 'ADD'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            } else {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  id: id,
-                  description: description,
-                  status: checkStatus,
-                  action: 'UPDATE'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            }
-
-          }
-        });
-    });
-
-
-    $(document).on('click', '.update', function(e) {
+    $(document).on('click', '.edit', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
+      var col1 = currentRow.find("td:eq(0)").text();
       swal({
           title: "Are you sure?",
-          text: "You want to update this data?",
+          text: "You want to approved this user?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -256,8 +195,8 @@
         .then((isConfirm) => {
           if (isConfirm) {
             $.ajax({
-              method: "PUT",
-              url: "../ajax/department.php",
+              method: "POST",
+              url: "../ajax/approval.php",
               data: {
                 id: col1,
                 action: 'UPDATE'
@@ -274,14 +213,13 @@
         });
     });
 
-
     $(document).on('click', '.delete', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
+      var col1 = currentRow.find("td:eq(0)").text();
       swal({
           title: "Are you sure?",
-          text: "You want to delete this data?",
+          text: "You want to reject this user?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -290,7 +228,7 @@
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/department.php",
+              url: "../ajax/approval.php",
               data: {
                 id: col1,
                 action: 'DELETE'

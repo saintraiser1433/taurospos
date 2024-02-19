@@ -39,10 +39,10 @@
                   <a class="dropdown-item" href="./department" rel="noopener">
                     Department
                   </a>
-                  <a class="dropdown-item" href="./changelog.html">
+                  <a class="dropdown-item" href="./borrowers.php">
                     Borrowers
                   </a>
-                  <a class="dropdown-item" href="https://github.com/tabler/tabler" target="_blank" rel="noopener">
+                  <a class="dropdown-item" href="./listapproved.php"  rel="noopener">
                     For Approval Borrowers
                   </a>
                 </div>
@@ -65,16 +65,16 @@
                   </span>
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="https://tabler.io/docs" target="_blank" rel="noopener">
+                  <a class="dropdown-item" href="./category.php"" rel="noopener">
                     Category
                   </a>
-                  <a class="dropdown-item" href="./changelog.html">
+                  <a class="dropdown-item" href="./items.php" rel="noopener">
                     Items
                   </a>
                 </div>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="./">
+                <a class="nav-link" href="./returned.php">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -89,7 +89,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="./">
+                <a class="nav-link" href="./transaction.php" rel="noopener">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -104,7 +104,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="./">
+                <a class="nav-link" href="./report.php" rel="noopener">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />

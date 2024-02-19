@@ -1,4 +1,4 @@
-<?php include '../connection.php'; ?>
+<?php include '../connection.php' ?>
 
 <!doctype html>
 
@@ -22,20 +22,20 @@
                 Overview
               </div>
               <h2 class="page-title">
-                Department
+                Category Panel
               </h2>
             </div>
             <!-- Page title actions -->
             <div class="col-auto ms-auto d-print-none">
               <div class="btn-list">
-                <a href="#" class="btn btn-primary d-none d-sm-inline-block add">
+                <a href="#" class="btn btn-primary d-none d-sm-inline-block add" >
                   <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new department
+                  Create new category
                 </a>
               </div>
             </div>
@@ -66,8 +66,8 @@
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-department">
-                            Department
+                          <button class="table-sort" data-sort="sort-category">
+                            Category Name
                           </button>
                         </th>
                         <th>
@@ -86,21 +86,22 @@
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_department order by department_id asc";
+                      $sql = "SELECT * from tbl_categories order by category_id asc";
                       $rs = $conn->query($sql);
                       $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
                           <td class="sort-id"><?php echo $i++ ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['department_name'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['category_name'] ?></td>
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
+                              echo '<span class="badge badge-sm bg-green text-white text-uppercase ms-auto">Active</span>';
                             } else if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
+                              echo '<span class="badge badge-sm bg-red text-white text-uppercase ms-auto">Inactive</span>';
                             }
                             ?>
+
                           </td>
                           <td>
                             <a href="#" class="badge bg-yellow edit">
@@ -122,10 +123,13 @@
                               </svg>
                             </a>
                           </td>
-                          <td class="d-none"><?php echo $row['department_id'] ?></td>
+                          <td class="d-none"><?php echo $row['category_id'] ?></td>
                           <td class="d-none"><?php echo $row['status'] ?></td>
                         </tr>
+
                       <?php } ?>
+
+
                     </tbody>
                   </table>
                   <br>
@@ -144,20 +148,20 @@
     </div>
   </div>
   <?php include '../components/modal.php' ?>
-
   <?php include '../components/script.php' ?>
 
 </body>
 
 </html>
+
 <script>
   $(document).ready(function() {
     let id = 0;
     $(document).on('click', '.add', function() {
-      $('#modal-department').modal('show');
-      $('.md-title').html('Insert Department');
+      $('#modal-category').modal('show');
+      $('#categoryName').val('');
+      $('.md-title').html('Insert Category');
       $('.my-switch').css('display', 'none');
-      $('#departmentName').val('');
     });
 
     $(document).on('click', '.edit', function() {
@@ -173,11 +177,11 @@
         stat = ''
       }
       id = data[4];
-      $('#modal-department').modal('show');
-      $('#departmentName').val(data[1])
-      $('.md-title').html('Update Department');
+      $('#modal-category').modal('show');
+      $('#categoryName').val(data[1])
+      $('.md-title').html('Update Category');
       $('.my-switch').css('display', 'block');
-      $('#departmentStatus').prop('checked', stat);
+      $('#categoryStatus').prop('checked', stat);
     });
 
 
@@ -185,8 +189,8 @@
     $(document).on('click', '#submit', function(e) {
       e.preventDefault();
       let checkStatus = 0;
-      var description = $('#departmentName').val();
-      var status = $('#departmentStatus').prop('checked');
+      var description = $('#categoryName').val();
+      var status = $('#categoryStatus').prop('checked');
       if (status) {
         checkStatus = 1;
       } else {
@@ -204,7 +208,7 @@
             if (id === 0) {
               $.ajax({
                 method: "POST",
-                url: "../ajax/department.php",
+                url: "../ajax/category.php",
                 data: {
                   description: description,
                   action: 'ADD'
@@ -220,7 +224,7 @@
             } else {
               $.ajax({
                 method: "POST",
-                url: "../ajax/department.php",
+                url: "../ajax/category.php",
                 data: {
                   id: id,
                   description: description,
@@ -257,7 +261,7 @@
           if (isConfirm) {
             $.ajax({
               method: "PUT",
-              url: "../ajax/department.php",
+              url: "../ajax/category.php",
               data: {
                 id: col1,
                 action: 'UPDATE'
@@ -290,7 +294,7 @@
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/department.php",
+              url: "../ajax/category.php",
               data: {
                 id: col1,
                 action: 'DELETE'
