@@ -79,7 +79,7 @@
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-status">
-                            Return Status
+                            Return Date
                           </button>
                         </th>
                         <th>
@@ -92,6 +92,7 @@
                             Action
                           </button>
                         </th>
+                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
@@ -103,7 +104,7 @@
                         b.item_name,
                         a.quantity,
                         a.start_date,
-                        a.return_date,
+                        a.expected_return_date,
                         a.status
                     FROM
                         tbl_transaction a
@@ -116,7 +117,7 @@
                       $rs = $conn->query($sql);
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['transaction_no'] ?></td>
+                          <td class="sort-id"><?php echo $row['transaction_no']?></td>
                           <td class="sort-id"><?php echo $row['fname'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
@@ -131,43 +132,37 @@
                             ?>
                           </td>
                           <td class="sort-returnedate text-capitalize">
-                            <?php echo $row['return_date']; ?>
+                            <?php echo $row['expected_return_date']; ?>
                           </td>
-                          <td><?php
-                              $date = date('Y-m-d');
-                              if ($date < $row['start_date'] || $date > $row['return_date']) {
-                                echo '<span class="badge bg-danger text-white">Overdue</span>';
-                              } else if ($row['start_date'] == null) {
-                                echo '<span class="badge bg-secondary text-white">Undetermined</span>';
-                              }else{
-                                echo '<span class="badge bg-success text-white">On Due Date</span>';
-                              }
-                              ?>
-                              </td>
+                          <td>
+
+                          </td>
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
+                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">RETURNED</span>';
                             } else if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
+                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">PARTIALLY RETURNED</span>';
                             } else if ($row['status'] == 2) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">WAITING TO RETURNED</span>';
                             } else if ($row['status'] == 3) {
-                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
+                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">WAITING TO RECEIVED</span>';
                             } else if ($row['status'] == 4) {
-                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">Rejected</span>';
+                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">REJECTED</span>';
+                            } else if ($row['status'] == 5) {
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">CANCELLED</span>';
                             } else {
-                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
+                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">FOR APPROVAL</span>';
                             }
                             ?>
                           </td>
                           <td>
                             <?php
                             if ($row['status'] == 1 || $row['status'] == 2) {
-                              echo '<a href="#" class="badge bg-info edit text-decoration-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up-double" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 14l-4 -4l4 -4" /><path d="M8 14l-4 -4l4 -4" /><path d="M9 10h7a4 4 0 1 1 0 8h-1" /></svg></a>';
+                              echo '<a href="#" class="badge bg-info return text-decoration-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up-double" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 14l-4 -4l4 -4" /><path d="M8 14l-4 -4l4 -4" /><path d="M9 10h7a4 4 0 1 1 0 8h-1" /></svg></a>';
                             } else if ($row['status'] == 3) {
                               echo '<a href="#" class="badge bg-info receive   text-decoration-none" title="Receive"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hand-grab" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 11v-3.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M11 9.5v-3a1.5 1.5 0 0 1 3 0v3.5" /><path d="M14 7.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M17 9.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" /></svg></a>';
-                            } else if ($row['status'] == 5) {
+                            } else if ($row['status'] == 6) {
                               echo '<a href="#" class="badge bg-success approved text-decoration-none" title="Approved">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-up-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 3a3 3 0 0 1 2.995 2.824l.005 .176v4h2a3 3 0 0 1 2.98 2.65l.015 .174l.005 .176l-.02 .196l-1.006 5.032c-.381 1.626 -1.502 2.796 -2.81 2.78l-.164 -.008h-8a1 1 0 0 1 -.993 -.883l-.007 -.117l.001 -9.536a1 1 0 0 1 .5 -.865a2.998 2.998 0 0 0 1.492 -2.397l.007 -.202v-1a3 3 0 0 1 3 -3z" stroke-width="0" fill="currentColor" /><path d="M5 10a1 1 0 0 1 .993 .883l.007 .117v9a1 1 0 0 1 -.883 .993l-.117 .007h-1a2 2 0 0 1 -1.995 -1.85l-.005 -.15v-7a2 2 0 0 1 1.85 -1.995l.15 -.005h1z" stroke-width="0" fill="currentColor" /></svg>
                               </a> | 
@@ -177,6 +172,7 @@
                             }
                             ?>
                           </td>
+                          <td class="d-none"><?php echo $row['item_code'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
@@ -187,7 +183,6 @@
                     <ul class="pagination ms-auto mb-0"></ul>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -205,98 +200,52 @@
 </html>
 <script>
   $(document).ready(function() {
-    let id = 0;
-    $(document).on('click', '.add', function() {
-      $('#modal-department').modal('show');
-      $('.md-title').html('Insert Department');
-      $('.my-switch').css('display', 'none');
-      $('#departmentName').val('');
-    });
-
-    $(document).on('click', '.edit', function() {
-      var currentRow = $(this).closest("tr");
-      let stat = '';
+    let transId = 0;
+    $(document).on('click', '.return', function() {
       $tr = $(this).closest('tr');
       var data = $tr.children("td").map(function() {
         return $(this).text();
       }).get();
-      if (data[5] == 1) {
-        stat = 'checked'
-      } else {
-        stat = ''
-      }
-      id = data[4];
-      $('#modal-department').modal('show');
-      $('#departmentName').val(data[1])
-      $('.md-title').html('Update Department');
-      $('.my-switch').css('display', 'block');
-      $('#departmentStatus').prop('checked', stat);
+      transId = data[0];
+      $('.md-title').html('Returned Items');
+      $('#modal-return').modal('show');
+
     });
 
 
-
-    $(document).on('click', '#submit', function(e) {
+    $(document).on('click', '#returnSubmit', function(e) {
       e.preventDefault();
-      let checkStatus = 0;
-      var description = $('#departmentName').val();
-      var status = $('#departmentStatus').prop('checked');
-      if (status) {
-        checkStatus = 1;
-      } else {
-        checkStatus = 0;
-      }
+      var qty = parseInt($('#returnqty').val());
       swal({
           title: "Are you sure?",
-          text: "You want to add this data?",
+          text: "You want to approved this transaction?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
         })
         .then((isConfirm) => {
           if (isConfirm) {
-            if (id === 0) {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  description: description,
-                  action: 'ADD'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            } else {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  id: id,
-                  description: description,
-                  status: checkStatus,
-                  action: 'UPDATE'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            }
-
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                transid: transId,
+                qty : qty,
+                action: 'RETURN'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
           }
         });
     });
 
 
-
-    //  APPROVED
     $(document).on('click', '.approved', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
@@ -365,8 +314,10 @@
 
     $(document).on('click', '.receive', function(e) {
       e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(0)").text();
+      $tr = $(this).closest('tr');
+      var data = $tr.children("td").map(function() {
+        return $(this).text();
+      }).get();
       swal({
           title: "Are you sure?",
           text: "This can't be undo this action?",
@@ -380,7 +331,9 @@
               method: "POST",
               url: "../ajax/transborrow.php",
               data: {
-                transid: col1,
+                transid: data[0],
+                qty: data[3],
+                code: data[9],
                 action: 'RECEIVE'
               },
               success: function(html) {

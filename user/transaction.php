@@ -92,7 +92,7 @@
                        b.item_name,
                        a.quantity,
                        a.start_date,
-                       a.return_date,
+                       a.expected_return_date,
                        a.status
                    FROM
                        tbl_transaction a
@@ -118,45 +118,39 @@
                           </td>
                           <td class="sort-returnedate text-capitalize">
                             <?php
-                            echo $row['return_date'];
+                            echo $row['expected_return_date'];
                             ?>
                           </td>
                           <td class="sort-status">
                             <?php
-                            if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
-                            } else if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Inactive</span>';
-                            }else if ($row['status'] == 2) {
+                            if ($row['status'] == 1) {
+                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
+                            } else if ($row['status'] == 2) {
                               echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
-                            }else if ($row['status'] == 3) {
+                            } else if ($row['status'] == 3) {
                               echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
-                            }else if ($row['status'] == 4) {
+                            } else if ($row['status'] == 4) {
                               echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">Rejected</span>';
-                            }else{
+                            } else if ($row['status'] == 5) {
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Cancelled</span>';
+                            } else if ($row['status'] == 6) {
                               echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
+                            }else  if ($row['status'] == 0) {
+                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
                             }
+
+                            
                             ?>
                           </td>
                           <td>
-                            <a href="#" class="badge bg-yellow edit">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
-                                <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
-                              </svg>
+                            <?php
+                            if ($row['status'] == 3 ||  $row['status'] == 6) {
+                              echo ' <a href="#" class="badge bg-danger cancel text-decoration-none" title="Reject">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>
+                              </a>';
+                            }
 
-                            </a> |
-                            <a href="#" class="badge bg-red delete">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 7h16" />
-                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                <path d="M10 12l4 4m0 -4l-4 4" />
-                              </svg>
-                            </a>
+                            ?>
                           </td>
                         </tr>
                       <?php } ?>
@@ -186,105 +180,13 @@
 </html>
 <script>
   $(document).ready(function() {
-    let id = 0;
-    $(document).on('click', '.add', function() {
-      $('#modal-department').modal('show');
-      $('.md-title').html('Insert Department');
-      $('.my-switch').css('display', 'none');
-      $('#departmentName').val('');
-    });
-
-    $(document).on('click', '.edit', function() {
-      var currentRow = $(this).closest("tr");
-      let stat = '';
-      $tr = $(this).closest('tr');
-      var data = $tr.children("td").map(function() {
-        return $(this).text();
-      }).get();
-      if (data[5] == 1) {
-        stat = 'checked'
-      } else {
-        stat = ''
-      }
-      id = data[4];
-      $('#modal-department').modal('show');
-      $('#departmentName').val(data[1])
-      $('.md-title').html('Update Department');
-      $('.my-switch').css('display', 'block');
-      $('#departmentStatus').prop('checked', stat);
-    });
-
-
-
-    $(document).on('click', '#submit', function(e) {
-      e.preventDefault();
-      let checkStatus = 0;
-      var description = $('#departmentName').val();
-      var status = $('#departmentStatus').prop('checked');
-      if (status) {
-        checkStatus = 1;
-      } else {
-        checkStatus = 0;
-      }
-      swal({
-          title: "Are you sure?",
-          text: "You want to add this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            if (id === 0) {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  description: description,
-                  action: 'ADD'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            } else {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  id: id,
-                  description: description,
-                  status: checkStatus,
-                  action: 'UPDATE'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            }
-
-          }
-        });
-    });
-
-
-
-
-    $(document).on('click', '.delete', function(e) {
+    $(document).on('click', '.cancel', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
+      var col1 = currentRow.find("td:eq(0)").text();
       swal({
           title: "Are you sure?",
-          text: "You want to delete this data?",
+          text: "You want to cancelled this transaction?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -293,10 +195,10 @@
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/department.php",
+              url: "../ajax/transborrow.php",
               data: {
-                id: col1,
-                action: 'DELETE'
+                transid: col1,
+                action: 'CANCELLED'
               },
               success: function(html) {
                 swal("Success", {

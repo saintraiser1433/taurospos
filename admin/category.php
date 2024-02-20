@@ -165,7 +165,6 @@
     });
 
     $(document).on('click', '.edit', function() {
-      var currentRow = $(this).closest("tr");
       let stat = '';
       $tr = $(this).closest('tr');
       var data = $tr.children("td").map(function() {

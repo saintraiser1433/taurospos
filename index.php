@@ -111,7 +111,10 @@ if (isset($_POST['submit'])) {
                             <button type="submit" name="submit" class="btn btn-primary w-100">Sign in</button>
 
                         </div>
-                        <div class="d-flex justify-content-center align-center mt-3">
+
+                        <div class="d-flex flex-column align-items-center mt-3">
+                            <a href="signup.php">No account? Registered Here!</a>
+                            
                             <?php
                             if (isset($_GET['us3r']) == 'admin') {
                                 echo '<a href="index.php">Login as user</a>';
