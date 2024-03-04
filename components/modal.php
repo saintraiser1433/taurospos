@@ -81,6 +81,7 @@
 <!-- modal inventory -->
 <div class="modal modal-blur fade" id="modal-inventory" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
+    <form enctype="multipart/form-data"></form>
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title md-title"></h5>
@@ -98,11 +99,13 @@
 
           </div>
           <div class="col-lg-8">
-            <div class="mb-3">
-              <label class="form-label">Item Code</label>
-              <input type="text" class="form-control" name="itemCode" id="itemCode" readonly>
-            </div>
             <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Item Code</label>
+                  <input type="text" class="form-control" name="itemCode" id="itemCode" readonly>
+                </div>
+              </div>
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Item Name</label>
@@ -115,13 +118,13 @@
                   <input type="text" name="itemDescription" class="form-control" id="itemDescription" required>
                 </div>
               </div>
+              
 
             </div>
             <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Category</label>
-
                   <select class="form-select text-capitalize" name="itemCategory" id="itemCategory" required>
                     <option value="" selected>-</option>
                     <?php
@@ -131,10 +134,7 @@
                     ?>
                       <option value="<?php echo $row['category_id'] ?>"><?php echo $row['category_name'] ?></option>
                     <?php } ?>
-
-
                   </select>
-
                 </div>
               </div>
               <div class="col-lg-6">
@@ -179,6 +179,39 @@
           Cancel
         </a>
         <button type="button" class="btn btn-primary ms-auto" id="submit">
+          <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 5l0 14" />
+            <path d="M5 12l14 0" />
+          </svg>
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal returned -->
+<div class="modal modal-blur fade" id="modal-return" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title md-title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Return Quantity</label>
+          <input type="number" class="form-control" id="returnqty" placeholder="Quantity">
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+          Cancel
+        </a>
+        <button class="btn btn-primary ms-auto" id="returnSubmit">
           <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
           <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
