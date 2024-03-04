@@ -1,20 +1,4 @@
-<?php 
-include '../connection.php';
-if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET['brw'] != '') {
-  $stat = $_GET['stat'];
-  $borrower = $_GET['brw'];
-  
-  if($stat == 0){
-    $sql = "UPDATE tbl_borrower SET status=1 where borrower_id='312312'";
-    $conn->query($sql);
-  }else if($stat == 1){
-    $sql = "UPDATE tbl_borrower SET status=0 where borrower_id='312312'";
-    $conn->query($sql);
-  }
- 
-}
-
-?>
+<?php include '../connection.php' ?>
 
 <!doctype html>
 
@@ -38,20 +22,20 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
                 Overview
               </div>
               <h2 class="page-title">
-                Borrower Panel
+                Category Panel
               </h2>
             </div>
             <!-- Page title actions -->
             <div class="col-auto ms-auto d-print-none">
               <div class="btn-list">
-
-                <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
+                <a href="#" class="btn btn-primary d-none d-sm-inline-block add">
                   <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
+                  Create new sizes
                 </a>
               </div>
             </div>
@@ -78,32 +62,12 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
                       <tr>
                         <th>
                           <button class="table-sort" data-sort="sort-id">
-                            Borrower ID
+                            #
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-department">
-                            Full Name
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-department">
-                            Type
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Department
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Phone
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Status
+                          <button class="table-sort" data-sort="sort-category">
+                            Description
                           </button>
                         </th>
                         <th>
@@ -111,60 +75,39 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
                             Action
                           </button>
                         </th>
+                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT
-                      CONCAT(
-                          a.first_name,
-                          ', ',
-                          a.last_name,
-                          ' ',
-                          LEFT(a.middle_name, 1)
-                      ) AS fname,
-                      a.borrower_id,
-                      a.type,
-                      a.status,
-                      a.phone_number,
-                      a.front_id_path,
-                      a.back_id_path,
-                      b.department_name
-                  FROM
-                      tbl_borrower a
-                  LEFT JOIN tbl_department b ON
-                      a.department_id = b.department_id
-                  WHERE (a.status = 0 OR a.status = 1) and status_approval = 1
-                  ORDER BY
-                      a.department_id ASC";
+                      $sql = "SELECT * from tbl_size order by size_id asc";
                       $rs = $conn->query($sql);
                       $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['borrower_id'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['fname'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['type'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['department_name'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['phone_number'] ?></td>
-                          <td class="sort-status">
-                            <?php
-                            if ($row['status'] == 1) {
-                              echo '<a href="?stat=0&brw='.$row['borrower_id'].'"><span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span></a>';
-                            } else if ($row['status'] == 0) {
-                              echo '<a href="?stat=1&brw='.$row['borrower_id'].'"><span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span></a>';
-                            }
-                            ?>
-                          </td>
+                          <th class="sort-id"><?php echo $i++ ?></th>
+                          <td class="sort-category text-capitalize"><?php echo $row['size_description'] ?></td>
                           <td>
-                            <a href="#" class="badge bg-info edit">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <a href="#" class="badge bg-yellow edit">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                                <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
+                                <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
                               </svg>
 
-                            </a> 
+                            </a> |
+                            <a href="#" class="badge bg-red delete">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M4 7h16" />
+                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                <path d="M10 12l4 4m0 -4l-4 4" />
+                              </svg>
+                            </a>
                           </td>
+                          <td class="d-none"><?php echo $row['size_id'] ?></td>
                         </tr>
 
                       <?php } ?>
@@ -187,21 +130,97 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
       <?php include '../components/footer.php' ?>
     </div>
   </div>
-
+  <?php include '../components/modal.php' ?>
   <?php include '../components/script.php' ?>
 
 </body>
 
 </html>
+
 <script>
   $(document).ready(function() {
+    let id = 0;
+    $(document).on('click', '.add', function() {
+      $('#modal-size').modal('show');
+      $('#sizeDescription').val('');
+      id = 0;
+      $('.md-size-title').html('Insert Category');
+    });
+
+    $(document).on('click', '.edit', function() {
+      let stat = '';
+      $tr = $(this).closest('tr');
+      var data = $tr.children("td").map(function() {
+        return $(this).text();
+      }).get();
+      id = data[2];
+      $('#modal-size').modal('show');
+      $('#sizeDescription').val(data[0])
+      $('.md-size-title').html('Update Size Description');
+    });
+
+
+
+    $(document).on('click', '#submit', function(e) {
+      e.preventDefault();
+      var description = $('#sizeDescription').val();
+      swal({
+          title: "Are you sure?",
+          text: "You want to add this size?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            if (id === 0) {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/size.php",
+                data: {
+                  description: description,
+                  action: 'ADD'
+                },
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            } else {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/size.php",
+                data: {
+                  id: id,
+                  description: description,
+                  action: 'UPDATE'
+                },
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            }
+
+          }
+        });
+    });
+
+
+
     $(document).on('click', '.delete', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
+      var col1 = currentRow.find("td:eq(2)").text();
       swal({
           title: "Are you sure?",
-          text: "You want to reject this user?",
+          text: "You want to delete this data?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -210,7 +229,7 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/approval.php",
+              url: "../ajax/size.php",
               data: {
                 id: col1,
                 action: 'DELETE'

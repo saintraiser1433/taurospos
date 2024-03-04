@@ -87,7 +87,7 @@
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-status">
-                            File
+                            Documents
                           </button>
                         </th>
                         <th>
@@ -131,8 +131,12 @@
                           <td class="sort-department text-capitalize"><?php echo $row['department_name'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['phone_number'] ?></td>
                           <td class="sort-status">
-                            <span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Link</span>
-
+                            <a href="#" class="badge bg-info documents">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-script" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M17 20h-11a3 3 0 0 1 0 -6h11a3 3 0 0 0 0 6h1a3 3 0 0 0 3 -3v-11a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v8" />
+                              </svg>
+                            </a>
                           </td>
                           <td>
                             <a href="#" class="badge bg-green edit">
@@ -170,10 +174,11 @@
           </div>
         </div>
       </div>
+      
       <?php include '../components/footer.php' ?>
     </div>
   </div>
-
+  <?php include '../components/modal.php' ?>
   <?php include '../components/script.php' ?>
 
 </body>
@@ -212,6 +217,44 @@
             });
           }
         });
+    });
+
+    $(document).on('click', '.documents', function(e) {
+      e.preventDefault();
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(0)").text();
+      $('#modal-documents').modal('show');
+      $('#FrontID').attr('src',`../static/front/${col1}.png`)
+      $('#BackID').attr('src',`../static/back/${col1}.png`)
+
+      // var currentRow = $(this).closest("tr");
+      // var col1 = currentRow.find("td:eq(0)").text();
+      // swal({
+      //     title: "Are you sure?",
+      //     text: "You want to approved this user?",
+      //     icon: "warning",
+      //     buttons: true,
+      //     dangerMode: true,
+      //   })
+      //   .then((isConfirm) => {
+      //     if (isConfirm) {
+      //       $.ajax({
+      //         method: "POST",
+      //         url: "../ajax/approval.php",
+      //         data: {
+      //           id: col1,
+      //           action: 'UPDATE'
+      //         },
+      //         success: function(html) {
+      //           swal("Success", {
+      //             icon: "success",
+      //           }).then((value) => {
+      //             location.reload();
+      //           });
+      //         }
+      //       });
+      //     }
+      //   });
     });
 
     $(document).on('click', '.delete', function(e) {

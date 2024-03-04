@@ -112,13 +112,13 @@
                   <input type="text" name="itemName" class="form-control" id="itemName" required>
                 </div>
               </div>
-              <div class="col-lg-6">
+              <div class="col-lg-12">
                 <div class="mb-3">
                   <label class="form-label">Description</label>
                   <input type="text" name="itemDescription" class="form-control" id="itemDescription" required>
                 </div>
               </div>
-              
+
 
             </div>
             <div class="row">
@@ -212,6 +212,73 @@
           Cancel
         </a>
         <button class="btn btn-primary ms-auto" id="returnSubmit">
+          <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 5l0 14" />
+            <path d="M5 12l14 0" />
+          </svg>
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- modal id dcoments -->
+<div class="modal modal-blur fade" id="modal-documents" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title md-approved">ID DOCUMENTS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-lg-6 d-flex flex-column align-items-center">
+            <h3>Front ID</h3>
+            <img id="FrontID" src="../static/images/no-image.png" width="230px" height="230px" style="max-height:230px; max-width:230px; min-width:230px; min-height:230px; border:2px solid gray">
+            
+          </div>
+          <div class="col-lg-6 d-flex flex-column align-items-center">
+            <h3>Back ID</h3>
+            <img id="BackID" src="../static/images/no-image.png" width="230px" height="230px" style="max-height:230px; max-width:230px; min-width:230px; min-height:230px; border:2px solid gray">
+            
+          </div>
+
+        </div>
+      </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+            Cancel
+          </a>
+         
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- modal size -->
+<div class="modal modal-blur fade" id="modal-size" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title md-size-title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Size Description</label>
+          <input type="text" class="form-control" id="sizeDescription" placeholder="Your size name">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+          Cancel
+        </a>
+        <button type="button" class="btn btn-primary ms-auto" id="submit">
           <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
           <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />

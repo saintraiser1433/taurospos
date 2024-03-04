@@ -65,6 +65,9 @@
               <a class="dropdown-item" href="./category.php"" rel=" noopener">
                 Category
               </a>
+              <a class="dropdown-item" href="./sizecategory.php"" rel=" noopener">
+                Sizes
+              </a>
               <a class="dropdown-item" href="./items.php" rel="noopener">
                 Items
               </a>
