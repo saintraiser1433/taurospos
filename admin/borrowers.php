@@ -110,8 +110,8 @@
                       a.type,
                       a.status,
                       a.phone_number,
-                      a.docs_file,
-                      a.borrower_id,
+                      a.front_id_path,
+                      a.back_id_path,
                       b.department_name
                   FROM
                       tbl_borrower a

@@ -1,4 +1,4 @@
 <?php 
 session_start();
 
-$conn= new mysqli("localhost","root","","borrowing");
+$conn= new mysqli("localhost","root","","borrows");

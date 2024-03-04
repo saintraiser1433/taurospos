@@ -125,7 +125,7 @@
                   <select class="form-select text-capitalize" name="itemCategory" id="itemCategory" required>
                     <option value="" selected>-</option>
                     <?php
-                    $sql = "SELECT * FROM tbl_categories order by category_id asc";
+                    $sql = "SELECT * FROM tbl_category order by category_id asc";
                     $rs = $conn->query($sql);
                     foreach ($rs as $row) {
                     ?>

@@ -86,7 +86,7 @@
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_categories order by category_id asc";
+                      $sql = "SELECT * from tbl_category order by category_id asc";
                       $rs = $conn->query($sql);
                       $i = 1;
                       foreach ($rs as $row) { ?>

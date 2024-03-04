@@ -110,7 +110,8 @@
                       a.type,
                       a.status,
                       a.phone_number,
-                      a.docs_file,
+                      a.front_id_path,
+                      a.back_id_path,
                       a.borrower_id,
                       b.department_name
                   FROM

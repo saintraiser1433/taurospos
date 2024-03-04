@@ -121,8 +121,8 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                       a.status,
                       a.img_path
                   FROM
-                      tbl_inventory a
-                  LEFT JOIN tbl_categories b ON
+                      tbl_item a
+                  LEFT JOIN tbl_category b ON
                       a.category_id = b.category_id AND b.status = 1
                   LEFT JOIN tbl_size c ON
                       a.size_id = c.size_id
