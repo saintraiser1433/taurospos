@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         $isImgUpdate = true;
     }
     if ($action == 'ADD') {
-        $sql = "INSERT INTO tbl_inventory 
+        $sql = "INSERT INTO tbl_item 
         (
             item_code,
             item_name,
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     } else if ($action == 'UPDATE') {
         $itemCode = $_POST['itemCode'];
         if ($isImgUpdate) {
-            $sql = "UPDATE tbl_inventory SET 
+            $sql = "UPDATE tbl_item SET 
             item_code = '$itemCode',
             item_name = '$itemName',
             category_id = $itemCategory,
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             img_path='$dir'
             WHERE item_code='$itemCode'";
         } else {
-            $sql = "UPDATE tbl_inventory SET 
+            $sql = "UPDATE tbl_item SET 
             item_code = '$itemCode',
             item_name = '$itemName',
             category_id = $itemCategory,
@@ -76,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     a.description,
     a.img_path
 FROM
-    tbl_inventory a
+tbl_item a
 WHERE item_code = '$itemCode'";
     $rs = $conn->query($sql);
     $data = [];

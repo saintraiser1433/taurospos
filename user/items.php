@@ -1,4 +1,10 @@
-<?php include '../connection.php'; ?>
+<?php 
+include '../connection.php';
+if(!isset($_SESSION['borrower_id'])){
+  header("Location:../index.php");
+}
+
+?>
 
 <!doctype html>
 
@@ -42,8 +48,8 @@
               b.category_name,
               a.description
           FROM
-              tbl_inventory a
-          LEFT JOIN tbl_categories b ON
+              tbl_item a
+          LEFT JOIN tbl_category b ON
               a.category_id = b.category_id
           LEFT JOIN tbl_size c ON
               a.size_id = c.size_id

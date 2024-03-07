@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 
     if ($action == 'ADD') {
         $sql = "INSERT INTO tbl_transaction 
-        (transaction_no,
+        (transaction_id,
             borrower_id,
             item_code,
             quantity,
@@ -23,24 +23,24 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     }
     if ($action == 'APPROVED') {
         $transId = $_POST['transid'];
-        $sql = "UPDATE tbl_transaction SET status=3 where transaction_no=$transId";
+        $sql = "UPDATE tbl_transaction SET status=3 where transaction_id=$transId";
         $conn->query($sql);
     } else if ($action == 'REJECT') {
         $transId = $_POST['transid'];
-        $sql = "UPDATE tbl_transaction SET status=4 where transaction_no=$transId";
+        $sql = "UPDATE tbl_transaction SET status=4 where transaction_id=$transId";
         $conn->query($sql);
     } else if ($action == 'RECEIVE') {
         $transId = $_POST['transid'];
         $qty = $_POST['qty'];
         $code = $_POST['code'];
         $startDate = date('Y-m-d');
-        $sql = "UPDATE tbl_transaction SET status=2, start_date='$startDate'  where transaction_no=$transId";
+        $sql = "UPDATE tbl_transaction SET status=2, start_date='$startDate'  where transaction_id=$transId";
         $conn->query($sql);
         $sqlx = "UPDATE tbl_inventory SET quantity=quantity-$qty where item_code='$code'";
         $conn->query($sqlx);
     } else if ($action == 'CANCELLED') {
         $transId = $_POST['transid'];
-        $sql = "UPDATE tbl_transaction SET status=5 where transaction_no=$transId";
+        $sql = "UPDATE tbl_transaction SET status=5 where transaction_id=$transId";
         $conn->query($sql);
     } else if ($action == 'RETURN') {
         $transId = $_POST['transid'];
@@ -49,15 +49,15 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
                 quantity
                 FROM
                     tbl_return_items
-                WHERE transaction_no = $transId";
+                WHERE transaction_id = $transId";
         $rs = $conn->query($mysql);
         if ($rs->num_rows > 0) {
-            $updateqty = "UPDATE tbl_return_items SET quantity=quantity+$qty where transaction_no=$transId";
+            $updateqty = "UPDATE tbl_return_items SET quantity=quantity+$qty where transaction_id=$transId";
             $conn->query($updateqty);
         } else {
-            $insertsql = "INSERT tbl_return_items (transaction_no,quantity) values ($transId,$qty)";
+            $insertsql = "INSERT tbl_return_items (transaction_id,quantity) values ($transId,$qty)";
             $conn->query($insertsql);
-            $sqlstatus = "UPDATE tbl_transaction SET status = 1 where transaction_no=$transId";
+            $sqlstatus = "UPDATE tbl_transaction SET status = 1 where transaction_id=$transId";
             $conn->query($sqlstatus);
         }
         checkReturns($transId, $conn);
@@ -73,7 +73,7 @@ function checkReturns($transId, $conn)
                 SELECT ri.quantity
                 FROM tbl_return_items ri
                 WHERE ri.transaction_no = ?)
-            AND trans.transaction_no = ?";
+            AND trans.transaction_id = ?";
     $stmt = $conn->prepare($sqlReturns);
     $stmt->bind_param("ii", $transId, $transId);
     $stmt->execute();
@@ -82,7 +82,7 @@ function checkReturns($transId, $conn)
 
     if ($result->num_rows > 0) {
         // Update status in tbl_return_items
-        $sql = "UPDATE tbl_transaction SET status = 0 WHERE transaction_no=?";
+        $sql = "UPDATE tbl_transaction SET status = 0 WHERE transaction_id=?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $transId);
         $stmt->execute();

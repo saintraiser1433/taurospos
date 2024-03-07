@@ -1,5 +1,9 @@
 <?php 
 include '../connection.php';
+if(!isset($_SESSION['admin_id'])){
+  header("Location:../index.php");
+}
+
 if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET['brw'] != '') {
   $stat = $_GET['stat'];
   $borrower = $_GET['brw'];

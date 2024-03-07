@@ -8,6 +8,8 @@ if (isset($_POST['submit'])) {
         $sql = "SELECT * FROM tbl_admin where username='$username' and password='$password'";
         $rs = $conn->query($sql);
         if ($rs->num_rows > 0) {
+            $row = $rs->fetch_assoc();
+            $_SESSION['admin_id'] = $row['admin_id'];
             header("Location:admin/index.php");
         } else {
             $_SESSION['response'] = "Incorrect Credentials";

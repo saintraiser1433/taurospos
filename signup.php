@@ -118,7 +118,7 @@ include 'connection.php';
                                     </div>
                                 </div>
                                 <div class="form-footer">
-                                    <button type="button" name="submit" id="signin" class="btn btn-primary w-100">Sign in</button>
+                                    <button type="button" name="submit" id="signin" class="btn btn-primary w-100">Register</button>
 
                                 </div>
 

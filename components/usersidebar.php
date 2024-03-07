@@ -49,7 +49,7 @@
               <div class="dropdown-menu-columns">
                 <div class="dropdown-menu-column">
                   <?php
-                  $sql = "SELECT category_id,category_name from tbl_categories order by category_id asc";
+                  $sql = "SELECT category_id,category_name from tbl_category order by category_id asc";
                   $rs = $conn->query($sql);
                   foreach ($rs as $row) {
                   ?>

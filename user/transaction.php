@@ -1,4 +1,11 @@
-<?php include '../connection.php'; ?>
+<?php 
+include '../connection.php';
+
+if(!isset($_SESSION['borrower_id'])){
+  header("Location:../index.php");
+}
+
+?>
 
 <!doctype html>
 
@@ -87,7 +94,7 @@
                     <tbody class="table-tbody">
                       <?php
                       $sql = "SELECT
-                       a.transaction_no,
+                       a.transaction_id,
                        a.item_code,
                        b.item_name,
                        a.quantity,
@@ -96,14 +103,14 @@
                        a.status
                    FROM
                        tbl_transaction a
-                   INNER JOIN tbl_inventory b ON
+                   INNER JOIN tbl_item b ON
                        a.item_code = b.item_code
                    ORDER BY
                        a.date_created ASC";
                       $rs = $conn->query($sql);
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['transaction_no'] ?></td>
+                          <td class="sort-id"><?php echo $row['transaction_id'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
                           <td class="sort-department text-capitalize">

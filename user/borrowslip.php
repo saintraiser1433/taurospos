@@ -1,6 +1,11 @@
 <?php include '../connection.php';
 $trn = substr(str_shuffle("01234567894578942"), 0, 8);
 
+if(!isset($_SESSION['borrower_id'])){
+  header("Location:../index.php");
+}
+
+
 if (isset($_GET['code'])) {
 } else {
   header("Location:items.php");
@@ -41,7 +46,7 @@ if (isset($_GET['code'])) {
                        ts.size_description,
                        inv.description
                      FROM
-                       tbl_inventory inv
+                       tbl_item inv
                      LEFT JOIN tbl_size ts ON
                        inv.size_id = ts.size_id
                      WHERE

@@ -1,4 +1,10 @@
-<?php include '../connection.php' ?>
+<?php 
+include '../connection.php'; 
+if(!isset($_SESSION['borrower_id'])){
+  header("Location:../index.php");
+}
+
+?>
 <!doctype html>
 
 <html lang="en">

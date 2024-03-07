@@ -1,4 +1,8 @@
 <?php include '../connection.php';
+if (!isset($_SESSION['admin_id'])) {
+  header("Location:../index.php");
+}
+
 $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 ?>
 
@@ -239,7 +243,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
           itemCode: id,
           action: 'GET'
         },
-        dataType:'json',
+        dataType: 'json',
         success: function(res) {
           const html = res[0];
           $('#itemCode').val(html.item_code)
@@ -249,7 +253,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
           $('#itemCondition').val(html.item_condition)
           $('#itemQty').val(html.quantity)
           $('#itemSize').val(html.size_id)
-          $('#ImgID').attr('src',`../static/item/${html.img_path}`)
+          $('#ImgID').attr('src', `../static/item/${html.img_path}`)
         }
       });
 
@@ -269,9 +273,9 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
       formData.append('itemQty', $('#itemQty').val());
       formData.append('itemSize', $('#itemSize').val());
       formData.append('files', fileInput.files[0]);
-      if(id === null){
+      if (id === null) {
         formData.append('action', 'ADD');
-      }else{
+      } else {
         formData.append('action', 'UPDATE');
       }
       swal({
