@@ -12,7 +12,7 @@ if(!isset($_SESSION['borrower_id'])){
 
 <html lang="en">
 <?php include '../components/head.php' ?>
-
+<?php include '../components/script.php' ?>
 <body class=" layout-fluid">
 
   <div class="page">

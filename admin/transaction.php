@@ -85,6 +85,11 @@ if(!isset($_SESSION['admin_id'])){
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-status">
+                            Returned Qty
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
                             Return Date
                           </button>
                         </th>
@@ -104,44 +109,74 @@ if(!isset($_SESSION['admin_id'])){
                     <tbody class="table-tbody">
                       <?php
                       $sql = "SELECT
-                        CONCAT(c.last_name,', ',c.first_name, ' ',LEFT(C.middle_name,1)) as fname,
-                        a.transaction_no,
-                        a.item_code,
-                        b.item_name,
-                        a.quantity,
-                        a.start_date,
-                        a.expected_return_date,
-                        a.status
-                    FROM
-                        tbl_transaction a
-                    INNER JOIN tbl_inventory b ON
-                        a.item_code = b.item_code
-                    INNER JOIN tbl_borrower c ON
+                      CONCAT(
+                          c.last_name,
+                          ', ',
+                          c.first_name,
+                          ' ',
+                          LEFT(C.middle_name, 1)
+                      ) AS fname,
+                      a.transaction_id,
+                      a.item_code,
+                      b.item_name,
+                      a.quantity,
+                      a.start_date,
+                      a.return_date,
+                      a.expected_return_date,
+                      a.status,
+                      a.return_quantity
+                  FROM
+                      tbl_transaction a
+                  INNER JOIN tbl_item b ON
+                      a.item_code = b.item_code
+                  INNER JOIN tbl_borrower c ON
                       a.borrower_id = c.borrower_id
-                    ORDER BY
-                        a.date_created ASC";
+                  WHERE a.status IN (1,2,3,6)
+                  ORDER BY
+                      a.date_created ASC";
                       $rs = $conn->query($sql);
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['transaction_no']?></td>
+                          <td class="sort-id"><?php echo $row['transaction_id']?></td>
                           <td class="sort-id"><?php echo $row['fname'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
                           <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
                           <td class="sort-department text-capitalize">
                             <?php
-                            if ($row['start_date'] == null) {
-                              echo '-';
+                            if ($row['start_date'] == '0000-00-00') {
+                              echo '----------';
                             } else {
-                              echo $row['start_date'];
+                              echo date('M-d-Y',strtotime($row['start_date']));
                             }
 
                             ?>
                           </td>
                           <td class="sort-returnedate text-capitalize">
-                            <?php echo $row['expected_return_date']; ?>
+                            <?php
+                            if ($row['expected_return_date'] == '0000-00-00') {
+                              echo '----------';
+                            } else {
+                              echo date('M-d-Y',strtotime($row['expected_return_date']));
+                            }
+                            ?>
                           </td>
+                          <td><?php 
+                          if($row['return_quantity'] == 0){
+                            echo '----------';
+                          }else{
+                            echo $row['return_quantity'];
+                          }
+                          ?>
+                          
+                         </td>
                           <td>
-
+                          <?php
+                            if ($row['return_date'] == '0000-00-00') {
+                              echo '----------';
+                            } else {
+                              echo date('M-d-Y',strtotime($row['return_date']));
+                            }
+                            ?>
                           </td>
                           <td class="sort-status">
                             <?php
@@ -207,15 +242,16 @@ if(!isset($_SESSION['admin_id'])){
 <script>
   $(document).ready(function() {
     let transId = 0;
+    let itemcode = null;
     $(document).on('click', '.return', function() {
       $tr = $(this).closest('tr');
       var data = $tr.children("td").map(function() {
         return $(this).text();
       }).get();
       transId = data[0];
+      itemcode = data[10];
       $('.md-title').html('Returned Items');
       $('#modal-return').modal('show');
-
     });
 
 
@@ -224,7 +260,7 @@ if(!isset($_SESSION['admin_id'])){
       var qty = parseInt($('#returnqty').val());
       swal({
           title: "Are you sure?",
-          text: "You want to approved this transaction?",
+          // text: "You want to approved this transaction?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -237,6 +273,7 @@ if(!isset($_SESSION['admin_id'])){
               data: {
                 transid: transId,
                 qty : qty,
+                item_code : itemcode,
                 action: 'RETURN'
               },
               success: function(html) {
@@ -339,7 +376,7 @@ if(!isset($_SESSION['admin_id'])){
               data: {
                 transid: data[0],
                 qty: data[3],
-                code: data[9],
+                code: data[10],
                 action: 'RECEIVE'
               },
               success: function(html) {

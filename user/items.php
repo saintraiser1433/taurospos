@@ -1,6 +1,6 @@
-<?php 
+<?php
 include '../connection.php';
-if(!isset($_SESSION['borrower_id'])){
+if (!isset($_SESSION['borrower_id'])) {
   header("Location:../index.php");
 }
 
@@ -10,7 +10,7 @@ if(!isset($_SESSION['borrower_id'])){
 
 <html lang="en">
 <?php include '../components/head.php' ?>
-
+<?php include '../components/script.php' ?>
 <body class=" layout-fluid">
 
   <div class="page">
@@ -20,11 +20,11 @@ if(!isset($_SESSION['borrower_id'])){
     <div class="page-wrapper">
       <!-- Page header -->
       <div class="page-header d-print-none">
-        <div class="container-xl">
+        <!-- <div class="container-xl">
           <div class="row align-items-center">
-            <div class="col-5">
-              <!-- Page pre-title -->
-              <div class="page-pretitle">
+            <div class="col-5"> -->
+        <!-- Page pre-title -->
+        <!-- <div class="page-pretitle">
                 Overview
               </div>
               <h2 class="page-title">
@@ -33,80 +33,132 @@ if(!isset($_SESSION['borrower_id'])){
             </div>
 
           </div>
-        </div>
+        </div> -->
 
         <!-- Page body -->
         <div class="page-body">
           <div class="container-xl">
-            <div class="row row-cards">
-              <?php
-              $sql = "SELECT
-              a.item_code,
-              a.item_name,
-              a.img_path,
-              a.quantity,
-              b.category_name,
-              a.description
-          FROM
-              tbl_item a
-          LEFT JOIN tbl_category b ON
-              a.category_id = b.category_id
-          LEFT JOIN tbl_size c ON
-              a.size_id = c.size_id
-          ORDER BY
-              a.date_created ASC";
-              $rs = $conn->query($sql);
-              foreach($rs as $row){ ?>
-              <div class="col-lg-4">
-                <div class="card card-link card-link-pop">
-                  <div class="card-stamp">
-                    <div class="card-stamp-icon bg-yellow">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-box" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
-                        <path d="M12 12l8 -4.5" />
-                        <path d="M12 12l0 9" />
-                        <path d="M12 12l-8 -4.5" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div class="card-status-bottom bg-primary"></div>
-                  <div class="row row-0">
-                    <div class="col-5">
-                      <img src="../static/item/<?php echo $row['img_path'] ?>" height="225px" />
-                    </div>
-                    <div class="col">
-                      <div class="card-body">
-                        <h3 class="card-title text-uppercase"><strong><?php echo $row['item_name'] ?></strong></h3>
-                        <p class="text-secondary text-capitalize"><?php echo $row['description'] ?></p>
-                        <h4>CATEGORY: <?php echo $row['category_name'] ?></h4>
-                        <h4>ITEM LEFT: <?php echo $row['quantity'] ?></h4>
-                        <div class="d-flex justify-content-center gap-2">
-                        <a href="borrowslip.php?code=<?php echo $row['item_code'] ?>" class="btn btn-success d-none d-sm-inline-block">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-box" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                              <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
-                              <path d="M12 12l8 -4.5" />
-                              <path d="M12 12l0 9" />
-                              <path d="M12 12l-8 -4.5" />
-                            </svg>
-                            BORROW</a>
-                          <button class="btn btn-primary w-50 p-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-align-box-left-middle" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                              <path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
-                              <path d="M9 15h-2" />
-                              <path d="M13 12h-6" />
-                              <path d="M11 9h-4" />
-                            </svg>DETAILS</button>
-                        </div>
+            <div class="row">
+              <div class="card">
+                <div class="card-header">
+
+                  <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
+                    <li class="nav-item">
+                      <a href="#all" class="nav-link active" data-bs-toggle="tab">All</a>
+                    </li>
+                    <?php
+                    $sql = "SELECT * FROM tbl_category order by category_id";
+                    $rs = $conn->query($sql);
+                    foreach ($rs as $row) { ?>
+                      <li class="nav-item">
+                        <a href="#<?php echo str_replace(' ', '', $row['category_name'] ) ?>" class="nav-link text-capitalize" data-bs-toggle="tab"><?php echo $row['category_name'] ?></a>
+                      </li>
+                    <?php } ?>
+                  </ul>
+                </div>
+                <div class="card-body w-75">
+                  <div class="tab-content">
+                    <div class="tab-pane active show" id="all">
+                      <div class="row" id="cardContainer">
+                        <?php
+                        $sqls = "SELECT
+                                      a.item_code,
+                                      a.item_name,
+                                      a.img_path,
+                                      a.quantity,
+                                      b.category_name,
+                                      a.description
+                                  FROM
+                                      tbl_item a
+                                  LEFT JOIN tbl_category b ON
+                                      a.category_id = b.category_id
+                                  LEFT JOIN tbl_size c ON
+                                      a.size_id = c.size_id
+                                  WHERE a.status=1
+                                  ORDER BY
+                                      a.date_created ASC";
+                        $rss = $conn->query($sqls);
+                        foreach ($rss as $rows) { ?>
+                          <div class="col-lg-3 pb-2">
+
+                            <div class="card card-link card-link-pop" onclick="window.location.href='borrowslip.php?code=<?php echo $rows['item_code'] ?>'" style="cursor:pointer">
+
+                              <?php
+                              if ($rows['quantity'] === '0') {
+                                echo "<div class='ribbon bg-danger'> Out of Stock </div>";
+                              } else {
+                                echo "<div class='ribbon bg-success'> Qty : " . $rows['quantity'] . "</div>";
+                              }
+                              ?>
+                              <div class="card-status-bottom bg-success"></div>
+                              <!-- Photo -->
+                              <div class="img-responsive img-responsive-16x9 card-img-top" style="background-image: url('../static/item/<?php echo $rows['img_path'] ?>')"></div>
+                              <div class="card-body">
+                                <span class="text-capitalize fw-bolder asname"><?php echo $rows['item_name'] ?></span>
+                                <p class="text-muted asdes"><?php echo $rows['description'] ?></p>
+
+                              </div>
+                            </div>
+                          </div>
+
+                        <?php } ?>
                       </div>
                     </div>
+                    <?php
+                    foreach ($rs as $rowx) { ?>
+                      <!-- <div class="tab-pane fade active show" id="tabs-home-8"> -->
+                      <div class="tab-pane fade show" id="<?php echo str_replace(' ', '', $rowx['category_name'] ) ?>">
+                        <div class="row">
+                          <?php
+                          $catid = $rowx['category_id'];
+                          $sql = "SELECT
+                          a.item_code,
+                          a.item_name,
+                          a.img_path,
+                          a.quantity,
+                          b.category_name,
+                          a.description
+                      FROM
+                          tbl_item a
+                      LEFT JOIN tbl_category b ON
+                          a.category_id = b.category_id
+                      LEFT JOIN tbl_size c ON
+                          a.size_id = c.size_id
+                      WHERE a.status=1 and a.category_id=$catid
+                      ORDER BY
+                          a.date_created ASC";
+                          $rst = $conn->query($sql);
+                          foreach ($rst as $rowt) { ?>
+                            <div class="col-lg-3 pb-2">
+
+                              <div class="card card-link card-link-pop" onclick="window.location.href='borrowslip.php?code=<?php echo $rowt['item_code'] ?>'" style="cursor:pointer">
+                                <?php
+                                if ($rowt['quantity'] === '0') {
+                                  echo "<div class='ribbon bg-danger'> Out of Stock </div>";
+                                } else {
+                                  echo "<div class='ribbon bg-success'> Qty : " . $rowt['quantity'] . "</div>";
+                                }
+                                ?>
+                                <div class="card-status-bottom bg-success"></div>
+                                <!-- Photo -->
+                                <div class="img-responsive img-responsive-4x3 card-img-top" style="background-image: url('../static/item/<?php echo $rowt['img_path'] ?>')"></div>
+                                <div class="card-body">
+                                  <span class="text-capitalize fw-bolder"><?php echo $rowt['item_name'] ?></span>
+                                  <p class="text-muted"><?php echo $rowt['description'] ?></p>
+                                </div>
+                              </div>
+                            </div>
+
+                          <?php } ?>
+                        </div>
+                      </div>
+                    <?php
+                    } ?>
                   </div>
                 </div>
               </div>
-              <?php } ?>
             </div>
+
           </div>
         </div>
 
@@ -124,161 +176,3 @@ if(!isset($_SESSION['borrower_id'])){
 </body>
 
 </html>
-<script>
-  $(document).ready(function() {
-    let id = 0;
-    $(document).on('click', '.add', function() {
-      $('#modal-department').modal('show');
-      $('.md-title').html('Insert Department');
-      $('.my-switch').css('display', 'none');
-      $('#departmentName').val('');
-    });
-
-    $(document).on('click', '.edit', function() {
-      var currentRow = $(this).closest("tr");
-      let stat = '';
-      $tr = $(this).closest('tr');
-      var data = $tr.children("td").map(function() {
-        return $(this).text();
-      }).get();
-      if (data[5] == 1) {
-        stat = 'checked'
-      } else {
-        stat = ''
-      }
-      id = data[4];
-      $('#modal-department').modal('show');
-      $('#departmentName').val(data[1])
-      $('.md-title').html('Update Department');
-      $('.my-switch').css('display', 'block');
-      $('#departmentStatus').prop('checked', stat);
-    });
-
-
-
-    $(document).on('click', '#submit', function(e) {
-      e.preventDefault();
-      let checkStatus = 0;
-      var description = $('#departmentName').val();
-      var status = $('#departmentStatus').prop('checked');
-      if (status) {
-        checkStatus = 1;
-      } else {
-        checkStatus = 0;
-      }
-      swal({
-          title: "Are you sure?",
-          text: "You want to add this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            if (id === 0) {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  description: description,
-                  action: 'ADD'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            } else {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/department.php",
-                data: {
-                  id: id,
-                  description: description,
-                  status: checkStatus,
-                  action: 'UPDATE'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            }
-
-          }
-        });
-    });
-
-
-    $(document).on('click', '.update', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to update this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "PUT",
-              url: "../ajax/department.php",
-              data: {
-                id: col1,
-                action: 'UPDATE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
-    });
-
-
-    $(document).on('click', '.delete', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to delete this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/department.php",
-              data: {
-                id: col1,
-                action: 'DELETE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
-    });
-  });
-</script>

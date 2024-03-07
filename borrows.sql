@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 04, 2024 at 03:46 PM
+-- Generation Time: Mar 07, 2024 at 05:44 PM
 -- Server version: 8.2.0
 -- PHP Version: 7.4.33
 
@@ -33,7 +33,14 @@ CREATE TABLE IF NOT EXISTS `tbl_admin` (
   `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`admin_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_admin`
+--
+
+INSERT INTO `tbl_admin` (`admin_id`, `username`, `password`) VALUES
+(1, 'admin', 'admin');
 
 -- --------------------------------------------------------
 
@@ -71,6 +78,29 @@ INSERT INTO `tbl_borrower` (`borrower_id`, `first_name`, `middle_name`, `last_na
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbl_cart`
+--
+
+DROP TABLE IF EXISTS `tbl_cart`;
+CREATE TABLE IF NOT EXISTS `tbl_cart` (
+  `cart_id` int NOT NULL AUTO_INCREMENT,
+  `item_code` varchar(100) NOT NULL,
+  `quantity` int NOT NULL,
+  `borrower_id` int NOT NULL,
+  PRIMARY KEY (`cart_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_cart`
+--
+
+INSERT INTO `tbl_cart` (`cart_id`, `item_code`, `quantity`, `borrower_id`) VALUES
+(10, 'ohb5s6', 1, 312312),
+(11, 'ohb5s6', 1, 312312);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_category`
 --
 
@@ -80,14 +110,15 @@ CREATE TABLE IF NOT EXISTS `tbl_category` (
   `category_name` varchar(100) NOT NULL,
   `status` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `tbl_category`
 --
 
 INSERT INTO `tbl_category` (`category_id`, `category_name`, `status`) VALUES
-(3, 'category1', 1);
+(3, 'category 1', 1),
+(4, 'Category 2', 1);
 
 -- --------------------------------------------------------
 
@@ -127,10 +158,20 @@ CREATE TABLE IF NOT EXISTS `tbl_item` (
   `status` int NOT NULL,
   `description` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `img_path` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`item_code`),
   KEY `fk_category_id` (`category_id`),
   KEY `fk_size_id` (`size_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_item`
+--
+
+INSERT INTO `tbl_item` (`item_code`, `item_name`, `category_id`, `size_id`, `quantity`, `item_condition`, `status`, `description`, `img_path`, `date_created`) VALUES
+('l4csb7', 'Beaker', 3, 2, 25, 'Good', 1, 'beaker description', 'Beaker1709819570.png', '2024-03-07 21:52:50'),
+('ls6w95', 'TEST CATEGORY', 3, 2, 123, 'Good', 1, 'CADAS', 'TEST CATEGORY1709825943.png', '2024-03-07 23:39:03'),
+('ohb5s6', '123123', 4, 2, 10, 'Good', 1, 'descriptiontgesst1', '1231231709817454.png', '2024-03-07 21:17:34');
 
 -- --------------------------------------------------------
 
@@ -192,17 +233,27 @@ INSERT INTO `tbl_size` (`size_id`, `size_description`) VALUES
 DROP TABLE IF EXISTS `tbl_transaction`;
 CREATE TABLE IF NOT EXISTS `tbl_transaction` (
   `transaction_id` int NOT NULL AUTO_INCREMENT,
+  `transaction_code` varchar(100) NOT NULL,
   `borrower_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `item_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `quantity` int NOT NULL,
-  `start_date` date NOT NULL,
-  `return_date` date DEFAULT NULL,
+  `return_quantity` int NOT NULL DEFAULT '0',
+  `start_date` date NOT NULL DEFAULT '0000-00-00',
+  `expected_return_date` date NOT NULL DEFAULT '0000-00-00',
+  `return_date` date NOT NULL DEFAULT '0000-00-00',
   `status` int NOT NULL,
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`transaction_id`),
   KEY `fk_borrower_id` (`borrower_id`),
   KEY `fk_item_code` (`item_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97858027 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_transaction`
+--
+
+INSERT INTO `tbl_transaction` (`transaction_id`, `transaction_code`, `borrower_id`, `item_code`, `quantity`, `return_quantity`, `start_date`, `expected_return_date`, `return_date`, `status`, `date_created`) VALUES
+(97858026, '', '312312', 'l4csb7', 2, 0, '0000-00-00', '0000-00-00', '0000-00-00', 5, '2024-03-08 00:15:59');
 
 --
 -- Constraints for dumped tables

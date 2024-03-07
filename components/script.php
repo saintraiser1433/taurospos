@@ -7,7 +7,7 @@
   <script src="../dist/js/list-datable.js"></script>
   <script src="../dist/libs/litepicker/dist/litepicker.js?1692870487"></script>
 <script src="../dist/libs/sweetalert/sweetalert.js"></script>
-  
+<script src="../dist/libs/toastr/toastr.min.js"/>
 
 
 <script>

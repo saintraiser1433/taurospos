@@ -9,6 +9,7 @@
     <link href="../dist/css/tabler-payments.min.css?1692870487" rel="stylesheet"/>
     <link href="../dist/css/tabler-vendors.min.css?1692870487" rel="stylesheet"/>
     <link href="../dist/css/demo.min.css?1692870487" rel="stylesheet"/>
+    <link href="../dist/libs/toastr/toastr.css" rel="stylesheet"/>
     <style>
       @import url('https://rsms.me/inter/inter.css');
       :root {

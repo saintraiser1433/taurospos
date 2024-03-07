@@ -1,14 +1,14 @@
 <?php include '../connection.php';
-$trn = substr(str_shuffle("01234567894578942"), 0, 8);
 
-if(!isset($_SESSION['borrower_id'])){
+
+if (!isset($_SESSION['borrower_id'])) {
   header("Location:../index.php");
 }
 
 
-if (isset($_GET['code'])) {
-} else {
+if (!isset($_GET['code'])) {
   header("Location:items.php");
+} else {
 }
 
 
@@ -16,7 +16,7 @@ if (isset($_GET['code'])) {
 <!doctype html>
 <html lang="en">
 <?php include '../components/head.php' ?>
-
+<?php include '../components/script.php' ?>
 <body class="layout-fluid">
 
   <div class="page">
@@ -54,7 +54,7 @@ if (isset($_GET['code'])) {
                       $rs = $conn->query($sql);
                       $row = $rs->fetch_assoc();
                       ?>
-                      Transaction #: <?php echo $trn ?>
+                      Item Code #: <?php echo $row['item_code'] ?>
                     </h3>
                     <p class="card-subtitle">
                     </p>
@@ -93,23 +93,10 @@ if (isset($_GET['code'])) {
                             <h4 class="text-capitalize">Size: <?php echo $row['size_description'] ?></h4>
                           </div>
                         </div>
-                        <div class="d-flex justify-content-start align-items-center gap-2">
-                          <h4 class="text-capitalize">Expected Returned Date:</h4>
-                          <div class="input-icon mb-3 w-50">
-                            <span class="input-icon-addon"><!-- Download SVG icon from http://tabler-icons.io/i/calendar -->
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
-                                <path d="M16 3v4" />
-                                <path d="M8 3v4" />
-                                <path d="M4 11h16" />
-                                <path d="M11 15h1" />
-                                <path d="M12 15v3" />
-                              </svg>
-                            </span>
-                            <input class="form-control rtndate" placeholder="Select a date" id="datepicker-icon-prepend" value="" required />
-                          </div>
-                        </div>
+                        <!-- <div class="d-flex justify-content-start align-items-center gap-2">
+                          <h4 class="text-capitalize">Expected Returned Date: <span class="text-muted"></span></h4>
+                         
+                  </div> -->
 
                         <div class="col-lg-12">
                           <div class="mb-3">
@@ -139,7 +126,7 @@ if (isset($_GET['code'])) {
   </div>
   </div>
 
-  <?php include '../components/script.php' ?>
+
 
 </body>
 
@@ -176,42 +163,17 @@ if (isset($_GET['code'])) {
 
   $(document).on('click', '#proceed', function(e) {
     e.preventDefault();
-    let rdate = $('.rtndate').val();
-    swal({
-        title: "Are you sure?",
-        text: "You want to borrow this item, This action won't undo",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-      })
-      .then((isConfirm) => {
-        if (isConfirm) {
-          if (rdate == '') {
-            swal("Please input returned date", {
-              icon: "error"
-            });
-          } else {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/transborrow.php",
-              data: {
-                transaction_no: <?php echo $trn ?>,
-                item_code: '<?php echo $_GET['code'] ?>',
-                borrowerId: '<?php echo $_SESSION['borrower_id'] ?>',
-                rtndate: rdate,
-                counter: counter,
-                action: 'ADD'
-              },
-              success: function(html) {
-                swal("Waiting for approval by admin", {
-                  icon: "info",
-                }).then((value) => {
-                  window.location.href = 'transaction.php'
-                });
-              }
-            });
-          }
-        }
-      });
+    $.ajax({
+      method: "POST",
+      url: "../ajax/cart.php",
+      data: {
+        item_code: '<?php echo $_GET['code'] ?>',
+        quantity: counter,
+        action: 'ADD'
+      },
+      success: function(html) {
+        toastr.success("Successfully added to cart");
+      }
+    });
   });
 </script>

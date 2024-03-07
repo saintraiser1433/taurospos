@@ -11,7 +11,7 @@ if(!isset($_SESSION['borrower_id'])){
 
 <html lang="en">
 <?php include '../components/head.php' ?>
-
+<?php include '../components/script.php' ?>
 <body class=" layout-fluid">
 
   <div class="page">
@@ -115,7 +115,7 @@ if(!isset($_SESSION['borrower_id'])){
                           <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
                           <td class="sort-department text-capitalize">
                             <?php
-                            if ($row['start_date'] == null) {
+                            if ($row['start_date'] == '0000-00-00') {
                               echo '-';
                             } else {
                               echo $row['start_date'];
@@ -124,8 +124,13 @@ if(!isset($_SESSION['borrower_id'])){
                             ?>
                           </td>
                           <td class="sort-returnedate text-capitalize">
-                            <?php
-                            echo $row['expected_return_date'];
+                          <?php
+                            if ($row['expected_return_date'] == '0000-00-00') {
+                              echo '-';
+                            } else {
+                              echo $row['expected_return_date'];
+                            }
+
                             ?>
                           </td>
                           <td class="sort-status">
