@@ -113,7 +113,7 @@ if (!isset($_SESSION['borrower_id'])) {
                       tbl_transaction_header a
                   INNER JOIN tbl_borrower b ON
                       a.borrower_id = b.borrower_id
-                  WHERE a.status IN(1,2,3,6) and a.borrower_id='$borrow'
+                  WHERE a.status IN(0,5,4) and a.borrower_id='$borrow'
                   ORDER BY
                       a.date_created
                   DESC";
@@ -153,6 +153,7 @@ if (!isset($_SESSION['borrower_id'])) {
                             ?>
                           </td>
                           <td class="sort-status">
+
                             <?php
                             if ($row['status'] == 1) {
                               echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
@@ -160,9 +161,15 @@ if (!isset($_SESSION['borrower_id'])) {
                               echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
                             } else if ($row['status'] == 3) {
                               echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
+                            } else if ($row['status'] == 4) {
+                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">Rejected</span>';
+                            } else if ($row['status'] == 5) {
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Cancelled</span>';
                             } else if ($row['status'] == 6) {
                               echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
-                            } 
+                            } else  if ($row['status'] == 0) {
+                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
+                            }
 
 
                             ?>
@@ -264,15 +271,11 @@ if (!isset($_SESSION['borrower_id'])) {
             var item = response[i];
             // Define a variable to hold the status badge HTML
             var statusBadge;
-            if (item.status == 4) {
-              statusBadge = '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
-            }else if (item.status == 3) {
-              statusBadge = '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to claim</span>';
-            }else if (item.status == 2) {
-              statusBadge = '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
+            if (item.status == 0) {
+              statusBadge = '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">Waiting to Returned</span>';
             } else if (item.status == 1) {
               statusBadge = '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
-            } else if (item.status == 0) {
+            } else if (item.status == 2) {
               statusBadge = '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">Returned</span>';
             }else{
               statusBadge = '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">Invalid</span>';
@@ -288,6 +291,7 @@ if (!isset($_SESSION['borrower_id'])) {
         </tr>`
             );
           }
+
         },
         error: function(xhr, status, error) {
           console.error(error); // Log any errors for debugging

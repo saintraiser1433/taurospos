@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 07, 2024 at 05:44 PM
+-- Generation Time: Mar 08, 2024 at 10:29 AM
 -- Server version: 8.2.0
--- PHP Version: 7.4.33
+-- PHP Version: 8.2.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -86,17 +86,11 @@ CREATE TABLE IF NOT EXISTS `tbl_cart` (
   `cart_id` int NOT NULL AUTO_INCREMENT,
   `item_code` varchar(100) NOT NULL,
   `quantity` int NOT NULL,
-  `borrower_id` int NOT NULL,
-  PRIMARY KEY (`cart_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `tbl_cart`
---
-
-INSERT INTO `tbl_cart` (`cart_id`, `item_code`, `quantity`, `borrower_id`) VALUES
-(10, 'ohb5s6', 1, 312312),
-(11, 'ohb5s6', 1, 312312);
+  `borrower_id` varchar(100) NOT NULL,
+  PRIMARY KEY (`cart_id`),
+  KEY `fk_cart_item_code` (`item_code`),
+  KEY `fk_cart_borrower_id` (`borrower_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -170,8 +164,8 @@ CREATE TABLE IF NOT EXISTS `tbl_item` (
 
 INSERT INTO `tbl_item` (`item_code`, `item_name`, `category_id`, `size_id`, `quantity`, `item_condition`, `status`, `description`, `img_path`, `date_created`) VALUES
 ('l4csb7', 'Beaker', 3, 2, 25, 'Good', 1, 'beaker description', 'Beaker1709819570.png', '2024-03-07 21:52:50'),
-('ls6w95', 'TEST CATEGORY', 3, 2, 123, 'Good', 1, 'CADAS', 'TEST CATEGORY1709825943.png', '2024-03-07 23:39:03'),
-('ohb5s6', '123123', 4, 2, 10, 'Good', 1, 'descriptiontgesst1', '1231231709817454.png', '2024-03-07 21:17:34');
+('ls6w95', 'TEST CATEGORY', 3, 2, 121, 'Good', 1, 'CADAS', 'TEST CATEGORY1709825943.png', '2024-03-07 23:39:03'),
+('ohb5s6', '123123', 4, 2, 8, 'Good', 1, 'descriptiontgesst1', '1231231709817454.png', '2024-03-07 21:17:34');
 
 -- --------------------------------------------------------
 
@@ -182,10 +176,11 @@ INSERT INTO `tbl_item` (`item_code`, `item_name`, `category_id`, `size_id`, `qua
 DROP TABLE IF EXISTS `tbl_penalty`;
 CREATE TABLE IF NOT EXISTS `tbl_penalty` (
   `penalty_id` int NOT NULL AUTO_INCREMENT,
-  `transaction_id` int NOT NULL,
-  `penalty` int NOT NULL,
+  `transaction_no` int NOT NULL,
+  `amount` double(50,2) NOT NULL,
+  `status` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`penalty_id`),
-  KEY `fk_transaction_no` (`transaction_id`)
+  KEY `fk_pen_trans_no` (`transaction_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -227,33 +222,55 @@ INSERT INTO `tbl_size` (`size_id`, `size_description`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tbl_transaction`
+-- Table structure for table `tbl_transaction_detail`
 --
 
-DROP TABLE IF EXISTS `tbl_transaction`;
-CREATE TABLE IF NOT EXISTS `tbl_transaction` (
-  `transaction_id` int NOT NULL AUTO_INCREMENT,
-  `transaction_code` varchar(100) NOT NULL,
-  `borrower_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `item_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+DROP TABLE IF EXISTS `tbl_transaction_detail`;
+CREATE TABLE IF NOT EXISTS `tbl_transaction_detail` (
+  `trans_item_id` int NOT NULL AUTO_INCREMENT,
+  `transaction_no` int NOT NULL,
+  `item_code` varchar(100) NOT NULL,
   `quantity` int NOT NULL,
   `return_quantity` int NOT NULL DEFAULT '0',
+  `status` int NOT NULL DEFAULT '4',
+  PRIMARY KEY (`trans_item_id`),
+  KEY `fk_dtl_item_code` (`item_code`),
+  KEY `fk_dtl_transaction_no` (`transaction_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_transaction_detail`
+--
+
+INSERT INTO `tbl_transaction_detail` (`trans_item_id`, `transaction_no`, `item_code`, `quantity`, `return_quantity`, `status`) VALUES
+(7, 20294498, 'ohb5s6', 2, 0, 2),
+(8, 20294498, 'ls6w95', 2, 0, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_transaction_header`
+--
+
+DROP TABLE IF EXISTS `tbl_transaction_header`;
+CREATE TABLE IF NOT EXISTS `tbl_transaction_header` (
+  `transaction_no` int NOT NULL,
+  `borrower_id` varchar(100) NOT NULL,
   `start_date` date NOT NULL DEFAULT '0000-00-00',
   `expected_return_date` date NOT NULL DEFAULT '0000-00-00',
   `return_date` date NOT NULL DEFAULT '0000-00-00',
-  `status` int NOT NULL,
+  `status` int DEFAULT '6',
   `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`transaction_id`),
-  KEY `fk_borrower_id` (`borrower_id`),
-  KEY `fk_item_code` (`item_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=97858027 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`transaction_no`),
+  KEY `fk_head_borrower_id` (`borrower_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `tbl_transaction`
+-- Dumping data for table `tbl_transaction_header`
 --
 
-INSERT INTO `tbl_transaction` (`transaction_id`, `transaction_code`, `borrower_id`, `item_code`, `quantity`, `return_quantity`, `start_date`, `expected_return_date`, `return_date`, `status`, `date_created`) VALUES
-(97858026, '', '312312', 'l4csb7', 2, 0, '0000-00-00', '0000-00-00', '0000-00-00', 5, '2024-03-08 00:15:59');
+INSERT INTO `tbl_transaction_header` (`transaction_no`, `borrower_id`, `start_date`, `expected_return_date`, `return_date`, `status`, `date_created`) VALUES
+(20294498, '312312', '2024-03-08', '2024-03-13', '0000-00-00', 2, '2024-03-08 15:22:58');
 
 --
 -- Constraints for dumped tables
@@ -266,6 +283,13 @@ ALTER TABLE `tbl_borrower`
   ADD CONSTRAINT `fk_tbl_department` FOREIGN KEY (`department_id`) REFERENCES `tbl_department` (`department_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
+-- Constraints for table `tbl_cart`
+--
+ALTER TABLE `tbl_cart`
+  ADD CONSTRAINT `fk_cart_borrower_id` FOREIGN KEY (`borrower_id`) REFERENCES `tbl_borrower` (`borrower_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_cart_item_code` FOREIGN KEY (`item_code`) REFERENCES `tbl_item` (`item_code`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `tbl_item`
 --
 ALTER TABLE `tbl_item`
@@ -276,7 +300,7 @@ ALTER TABLE `tbl_item`
 -- Constraints for table `tbl_penalty`
 --
 ALTER TABLE `tbl_penalty`
-  ADD CONSTRAINT `fk_transaction_no` FOREIGN KEY (`transaction_id`) REFERENCES `tbl_transaction` (`transaction_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk_pen_trans_no` FOREIGN KEY (`transaction_no`) REFERENCES `tbl_transaction_header` (`transaction_no`);
 
 --
 -- Constraints for table `tbl_retirement`
@@ -285,11 +309,17 @@ ALTER TABLE `tbl_retirement`
   ADD CONSTRAINT `fk_item_code2` FOREIGN KEY (`item_code`) REFERENCES `tbl_item` (`item_code`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints for table `tbl_transaction`
+-- Constraints for table `tbl_transaction_detail`
 --
-ALTER TABLE `tbl_transaction`
-  ADD CONSTRAINT `fk_borrower_id` FOREIGN KEY (`borrower_id`) REFERENCES `tbl_borrower` (`borrower_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk_item_code` FOREIGN KEY (`item_code`) REFERENCES `tbl_item` (`item_code`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `tbl_transaction_detail`
+  ADD CONSTRAINT `fk_dtl_item_code` FOREIGN KEY (`item_code`) REFERENCES `tbl_item` (`item_code`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_dtl_transaction_no` FOREIGN KEY (`transaction_no`) REFERENCES `tbl_transaction_header` (`transaction_no`);
+
+--
+-- Constraints for table `tbl_transaction_header`
+--
+ALTER TABLE `tbl_transaction_header`
+  ADD CONSTRAINT `fk_head_borrower_id` FOREIGN KEY (`borrower_id`) REFERENCES `tbl_borrower` (`borrower_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

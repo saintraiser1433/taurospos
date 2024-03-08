@@ -323,7 +323,7 @@
                   </th>
                   <th>
                     <button class="table-sort" data-sort="sort-status">
-                      Return Quantity
+                      Returned Quantity
                     </button>
                   </th>
                   <th>
@@ -331,21 +331,19 @@
                       Status
                     </button>
                   </th>
+                  <th id="act">To be return quantity</th>
+                  <th class="d-none"></th>
+                  <th class="d-none"></th>
                 </tr>
               </thead>
-              <tbody class="table-tbody thedata">           
+              <tbody class="table-tbody thedata">
               </tbody>
             </table>
-            <br>
-            <div class="btn-toolbar">
-              <p class="mb-0" id="listjs-showing-items-label">Showing 0 items</p>
-              <ul class="pagination ms-auto mb-0"></ul>
-            </div>
+            
           </div>
 
         </div>
       </div>
-      
     </div>
   </div>
 </div>

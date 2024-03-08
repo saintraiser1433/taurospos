@@ -1,6 +1,7 @@
-<?php 
+<?php
 include '../connection.php';
-if(!isset($_SESSION['admin_id'])){
+
+if (!isset($_SESSION['admin_id'])) {
   header("Location:../index.php");
 }
 
@@ -10,6 +11,7 @@ if(!isset($_SESSION['admin_id'])){
 
 <html lang="en">
 <?php include '../components/head.php' ?>
+<?php include '../components/script.php' ?>
 
 <body class=" layout-fluid">
 
@@ -63,16 +65,7 @@ if(!isset($_SESSION['admin_id'])){
                             Borrower Name
                           </button>
                         </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-department">
-                            Item Name
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Quantity
-                          </button>
-                        </th>
+
                         <th>
                           <button class="table-sort" data-sort="sort-status">
                             Start Date
@@ -81,11 +74,6 @@ if(!isset($_SESSION['admin_id'])){
                         <th>
                           <button class="table-sort" data-sort="sort-status">
                             Expected Returned Date
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Returned Qty
                           </button>
                         </th>
                         <th>
@@ -103,117 +91,90 @@ if(!isset($_SESSION['admin_id'])){
                             Action
                           </button>
                         </th>
-                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
                       $sql = "SELECT
                       CONCAT(
-                          c.last_name,
+                          b.first_name,
                           ', ',
-                          c.first_name,
+                          b.last_name,
                           ' ',
-                          LEFT(C.middle_name, 1)
-                      ) AS fname,
-                      a.transaction_id,
-                      a.item_code,
-                      b.item_name,
-                      a.quantity,
+                          LEFT(b.middle_name, 1)
+                      ) AS borrower_name,
+                      a.transaction_no,
                       a.start_date,
-                      a.return_date,
                       a.expected_return_date,
-                      a.status,
-                      a.return_quantity
+                      a.return_date,
+                      a.status
                   FROM
-                      tbl_transaction a
-                  INNER JOIN tbl_item b ON
-                      a.item_code = b.item_code
-                  INNER JOIN tbl_borrower c ON
-                      a.borrower_id = c.borrower_id
-                  WHERE a.status IN (1,2,3,6)
+                      tbl_transaction_header a
+                  INNER JOIN tbl_borrower b ON
+                      a.borrower_id = b.borrower_id
+                  WHERE a.status IN(1,2,3,6)
                   ORDER BY
-                      a.date_created ASC";
+                      a.date_created
+                  DESC";
                       $rs = $conn->query($sql);
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['transaction_id']?></td>
-                          <td class="sort-id"><?php echo $row['fname'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
+                          <td class="sort-id"><?php echo $row['transaction_no'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['borrower_name'] ?></td>
                           <td class="sort-department text-capitalize">
                             <?php
                             if ($row['start_date'] == '0000-00-00') {
-                              echo '----------';
+                              echo '-';
                             } else {
-                              echo date('M-d-Y',strtotime($row['start_date']));
+                              echo $row['start_date'];
+                            }
+
+                            ?>
+                          </td>
+                          <td class="sort-returndate text-capitalize">
+                            <?php
+                            if ($row['expected_return_date'] == '0000-00-00') {
+                              echo '-';
+                            } else {
+                              echo $row['expected_return_date'];
                             }
 
                             ?>
                           </td>
                           <td class="sort-returnedate text-capitalize">
                             <?php
-                            if ($row['expected_return_date'] == '0000-00-00') {
-                              echo '----------';
-                            } else {
-                              echo date('M-d-Y',strtotime($row['expected_return_date']));
-                            }
-                            ?>
-                          </td>
-                          <td><?php 
-                          if($row['return_quantity'] == 0){
-                            echo '----------';
-                          }else{
-                            echo $row['return_quantity'];
-                          }
-                          ?>
-                          
-                         </td>
-                          <td>
-                          <?php
                             if ($row['return_date'] == '0000-00-00') {
-                              echo '----------';
+                              echo '-';
                             } else {
-                              echo date('M-d-Y',strtotime($row['return_date']));
+                              echo $row['return_date'];
                             }
+
                             ?>
                           </td>
                           <td class="sort-status">
                             <?php
-                            if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">RETURNED</span>';
-                            } else if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">PARTIALLY RETURNED</span>';
+                            if ($row['status'] == 1) {
+                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
                             } else if ($row['status'] == 2) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">WAITING TO RETURNED</span>';
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
                             } else if ($row['status'] == 3) {
-                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">WAITING TO RECEIVED</span>';
-                            } else if ($row['status'] == 4) {
-                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">REJECTED</span>';
-                            } else if ($row['status'] == 5) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">CANCELLED</span>';
-                            } else {
-                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">FOR APPROVAL</span>';
+                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
+                            } else if ($row['status'] == 6) {
+                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
                             }
+
+
                             ?>
                           </td>
                           <td>
-                            <?php
-                            if ($row['status'] == 1 || $row['status'] == 2) {
-                              echo '<a href="#" class="badge bg-info return text-decoration-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up-double" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 14l-4 -4l4 -4" /><path d="M8 14l-4 -4l4 -4" /><path d="M9 10h7a4 4 0 1 1 0 8h-1" /></svg></a>';
-                            } else if ($row['status'] == 3) {
-                              echo '<a href="#" class="badge bg-info receive   text-decoration-none" title="Receive"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hand-grab" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 11v-3.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M11 9.5v-3a1.5 1.5 0 0 1 3 0v3.5" /><path d="M14 7.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M17 9.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" /></svg></a>';
-                            } else if ($row['status'] == 6) {
-                              echo '<a href="#" class="badge bg-success approved text-decoration-none" title="Approved">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-up-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 3a3 3 0 0 1 2.995 2.824l.005 .176v4h2a3 3 0 0 1 2.98 2.65l.015 .174l.005 .176l-.02 .196l-1.006 5.032c-.381 1.626 -1.502 2.796 -2.81 2.78l-.164 -.008h-8a1 1 0 0 1 -.993 -.883l-.007 -.117l.001 -9.536a1 1 0 0 1 .5 -.865a2.998 2.998 0 0 0 1.492 -2.397l.007 -.202v-1a3 3 0 0 1 3 -3z" stroke-width="0" fill="currentColor" /><path d="M5 10a1 1 0 0 1 .993 .883l.007 .117v9a1 1 0 0 1 -.883 .993l-.117 .007h-1a2 2 0 0 1 -1.995 -1.85l-.005 -.15v-7a2 2 0 0 1 1.85 -1.995l.15 -.005h1z" stroke-width="0" fill="currentColor" /></svg>
-                              </a> | 
-                              <a href="#" class="badge bg-danger reject text-decoration-none" title="Reject">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-down-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 21.008a3 3 0 0 0 2.995 -2.823l.005 -.177v-4h2a3 3 0 0 0 2.98 -2.65l.015 -.173l.005 -.177l-.02 -.196l-1.006 -5.032c-.381 -1.625 -1.502 -2.796 -2.81 -2.78l-.164 .008h-8a1 1 0 0 0 -.993 .884l-.007 .116l.001 9.536a1 1 0 0 0 .5 .866a2.998 2.998 0 0 1 1.492 2.396l.007 .202v1a3 3 0 0 0 3 3z" stroke-width="0" fill="currentColor" /><path d="M5 14.008a1 1 0 0 0 .993 -.883l.007 -.117v-9a1 1 0 0 0 -.883 -.993l-.117 -.007h-1a2 2 0 0 0 -1.995 1.852l-.005 .15v7a2 2 0 0 0 1.85 1.994l.15 .005h1z" stroke-width="0" fill="currentColor" /></svg>
-                              </a>';
-                            }
-                            ?>
+                            <a href="#" class="badge bg-primary details text-decoration-none" title="View Details">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-details" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M11.999 3l.001 17" />
+                                <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
+                              </svg>
+                            </a>
                           </td>
-                          <td class="d-none"><?php echo $row['item_code'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
@@ -224,6 +185,7 @@ if(!isset($_SESSION['admin_id'])){
                     <ul class="pagination ms-auto mb-0"></ul>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -242,50 +204,145 @@ if(!isset($_SESSION['admin_id'])){
 <script>
   $(document).ready(function() {
     let transId = 0;
-    let itemcode = null;
-    $(document).on('click', '.return', function() {
+
+
+    $(document).on('click', '.details', function() {
       $tr = $(this).closest('tr');
       var data = $tr.children("td").map(function() {
         return $(this).text();
       }).get();
-      transId = data[0];
-      itemcode = data[10];
-      $('.md-title').html('Returned Items');
-      $('#modal-return').modal('show');
+
+      $.ajax({
+        method: "POST",
+        url: "../ajax/transborrow.php",
+        data: {
+          trans_code: data[0],
+          action: 'GET'
+        },
+        success: function(response) {
+          $('#modal-details').modal('show');
+          // Clear existing data first
+          $('.thedata').empty();
+          // Iterate over each object in the response array
+          for (var i = 0; i < response.length; i++) {
+            var item = response[i];
+            // Define a variable to hold the status badge HTML
+            var statusBadge;
+            if (item.status == 4) {
+              statusBadge = '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
+            } else if (item.status == 3) {
+              statusBadge = '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to claim</span>';
+            } else if (item.status == 2) {
+              statusBadge = '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
+            } else if (item.status == 1) {
+              statusBadge = '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
+            } else if (item.status == 0) {
+              statusBadge = '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">Returned</span>';
+            } else {
+              statusBadge = '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">Invalid</span>';
+            }
+
+
+            if (item.status == 1 || item.status == 2) {
+              $('#act').show();
+              $('.thedata').append(
+                `<tr>
+                <td>${item.item_name}</td>
+                <td>${item.qty}</td>
+                <td>${item.return_quantity}</td>
+                <td>${statusBadge}</td>
+                <td><div class="d-flex justify-start-between gap-3">
+                          <div class="input-group" style="width:140px">
+                            <button class="input-group-text h-75" id="minus">-</button>
+                            <input type="text" class="form-control text-center h-75" id="counter" value="1" autocomplete="off" readonly data-max-quantity="${item.qty}">
+                            <button class="input-group-text h-75" id="add">+</button>
+                          </div>
+                          <div>
+                          <a href="#" class="badge bg-success ok">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                          </a> 
+                          </div>
+                         
+                     </div>
+                     
+                 </td>
+                 <td class="d-none">${item.trans_item_id}</td>
+                 <td class="d-none">${item.item_code}</td>
+                </tr>`
+              );
+            } else {
+              $('#act').hide();
+              $('.thedata').append(
+                `<tr>
+                <td>${item.item_name}</td>
+                <td>${item.qty}</td>
+                <td>${item.return_quantity}</td>
+                <td>${statusBadge}</td>
+                </tr>`
+              );
+            }
+
+          }
+
+        },
+        error: function(xhr, status, error) {
+          console.error(error); // Log any errors for debugging
+        }
+      });
     });
 
 
-    $(document).on('click', '#returnSubmit', function(e) {
+    $(document).on('click', '#add', function() {
+      var counterElement = $(this).siblings('input');
+      var currentValue = parseInt(counterElement.val());
+      var maxQuantity = parseInt(counterElement.data('max-quantity')); // Get the maximum quantity from data attribute
+      if (currentValue < maxQuantity) {
+        counterElement.val(currentValue + 1);
+      }
+    });
+
+    $(document).on('click', '#minus', function() {
+      var counterElement = $(this).siblings('input');
+      var currentValue = parseInt(counterElement.val());
+      if (currentValue > 1) {
+        counterElement.val(currentValue - 1);
+      }
+    });
+
+
+    $(document).on('click', '.ok', function(e) {
       e.preventDefault();
-      var qty = parseInt($('#returnqty').val());
-      swal({
-          title: "Are you sure?",
-          // text: "You want to approved this transaction?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/transborrow.php",
-              data: {
-                transid: transId,
-                qty : qty,
-                item_code : itemcode,
-                action: 'RETURN'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
+  
+      var currentRow = $(this).closest("tr");
+      var transId = currentRow.find("td:eq(5)").text();
+      var itemCode = currentRow.find("td:eq(6)").text();
+      // swal({
+      //     title: "Are you sure?",
+      //     icon: "warning",
+      //     buttons: true,
+      //     dangerMode: true,
+      //   })
+      //   .then((isConfirm) => {
+      //     if (isConfirm) {
+      //       $.ajax({
+      //         method: "POST",
+      //         url: "../ajax/transborrow.php",
+      //         data: {
+      //           transid: transId,
+      //           qty: currentValue,
+      //           item_code: itemCode,
+      //           action: 'RETURN'
+      //         },
+      //         success: function(html) {
+      //           swal("Success", {
+      //             icon: "success",
+      //           }).then((value) => {
+      //             location.reload();
+      //           });
+      //         }
+      //       });
+      //     }
+      //   });
     });
 
 
@@ -390,5 +447,6 @@ if(!isset($_SESSION['admin_id'])){
           }
         });
     });
+
   });
 </script>

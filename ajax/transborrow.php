@@ -8,19 +8,23 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $itemCode = @$_POST['item_code'];
     $counter = @$_POST['counter'];
     $rtndate = @$_POST['rtndate'];
+    $transId = @$_POST['transid'];
+    $qty = @$_POST['qty'];
     if ($action == 'GET') {
         $sqlt = "SELECT
         b.item_name,
         SUM(a.quantity) as qty,
-        a.return_quantity
+        a.return_quantity,
+        a.status,
+        a.trans_item_id,
+        a.item_code
     FROM
-        tbl_transaction a
+        tbl_transaction_detail a
     INNER JOIN tbl_item b ON
         a.item_code = b.item_code
     WHERE
-        a.transaction_code = '$trans'
-    group by a.item_code    
-    ";
+        a.transaction_no = '$trans'
+    group by a.item_code";
         $rs = $conn->query($sqlt);
         $response = array();
         if ($rs) {
@@ -32,68 +36,79 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         header('Content-Type: application/json');
         echo json_encode($response);
     } else if ($action == 'ADD') {
-        $sql = "INSERT INTO tbl_transaction(
-            transaction_code,
-            borrower_id,
+
+        //add header transaction
+        $sqlt = "INSERT INTO tbl_transaction_header(transaction_no,borrower_id) values ('$trans','$borrowId')";
+        $conn->query($sqlt);
+
+        //add detail transaction
+        $sql = "INSERT INTO tbl_transaction_detail(
+            transaction_no,
             item_code,
-            quantity,
-            STATUS
+            quantity
         )
         SELECT
             $trans,
-            borrower_id,
             item_code,
-            sum(quantity) as qty,
-            6
+            sum(quantity) as qty
         FROM
             tbl_cart
         WHERE
             borrower_id = '$borrowId'
-        GROUP BY item_code  
-        ";
+        GROUP BY item_code";
         $conn->query($sql);
 
         $delcart = "DELETE FROM tbl_cart where borrower_id='$borrowId'";
         $conn->query($delcart);
     } else if ($action == 'APPROVED') {
-        $transId = $_POST['transid'];
-        $sql = "UPDATE tbl_transaction SET status=3 where transaction_id=$transId";
+        //for approve
+        $sqls = "UPDATE tbl_transaction_header SET status=3 where transaction_no=$transId";
+        $sql = "UPDATE tbl_transaction_detail SET status=3 where transaction_no=$transId";
+        $conn->query($sqls);
         $conn->query($sql);
     } else if ($action == 'REJECT') {
-        $transId = $_POST['transid'];
-        $sql = "UPDATE tbl_transaction SET status=4 where transaction_id=$transId";
+        //for reject
+        $sqlt = "UPDATE tbl_transaction_header SET status=4 where transaction_no=$transId";
+        $sql = "UPDATE tbl_transaction_detail SET status=5 where transaction_no=$transId";
         $conn->query($sql);
+        $conn->query($sqlt);
     } else if ($action == 'RECEIVE') {
-        $transId = $_POST['transid'];
-        $qty = $_POST['qty'];
-        $code = $_POST['code'];
+        //for receive
         $startDate = date('Y-m-d');
         $return = date('Y-m-d', strtotime('+5 days'));
-        $sql = "UPDATE tbl_transaction SET status=2, start_date='$startDate',expected_return_date='$return' where transaction_id=$transId";
-        $conn->query($sql);
-        $sqlx = "UPDATE tbl_item SET quantity=quantity-$qty where item_code='$code'";
-        $conn->query($sqlx);
+        $sqldetail = "UPDATE tbl_transaction_header SET status=2, start_date='$startDate',expected_return_date='$return' where transaction_no=$transId";
+        $conn->query($sqldetail);
+        $sqlheader = "UPDATE tbl_transaction_detail SET status=2 where transaction_no=$transId";
+        $conn->query($sqlheader);
+        $sqltransdet="SELECT quantity,item_code FROM tbl_transaction_detail where transaction_no=$transId";
+        $rstransdet = $conn->query($sqltransdet);
+        foreach($rstransdet as $rowtrans){
+            $transqty = $rowtrans['quantity'];
+            $code = $rowtrans['item_code'];
+            $sqlx = "UPDATE tbl_item SET quantity=quantity-$transqty where item_code='$code'";
+            $conn->query($sqlx);
+        }
     } else if ($action == 'CANCELLED') {
-        $transId = $_POST['transid'];
-        $sql = "UPDATE tbl_transaction SET status=5 where transaction_id=$transId";
+        //for cancelled
+        $sqlt = "UPDATE tbl_transaction_header SET status=5 where transaction_no=$transId";
+        $sql = "UPDATE tbl_transaction_detail SET status=5 where transaction_no=$transId";
         $conn->query($sql);
+        $conn->query($sqlt);
     } else if ($action == 'RETURN') {
-        $transId = $_POST['transid'];
-        $qty = $_POST['qty'];
+        //for return
         $mysql = "SELECT
                 quantity,
                 return_quantity
                 FROM
-                    tbl_transaction
-                WHERE transaction_id = $transId";
+                    tbl_transaction_detail
+                WHERE transaction_no = $transId";
         $rs = $conn->query($mysql);
         if ($rs->num_rows > 0) {
             $row = $rs->fetch_assoc();
-            $updateqty = "UPDATE tbl_transaction SET return_quantity=return_quantity+$qty where transaction_id=$transId";
+            $updateqty = "UPDATE tbl_transaction_detail SET return_quantity=return_quantity+$qty where transaction_no=$transId";
             $conn->query($updateqty);
             $qtys = "UPDATE tbl_item SET quantity=quantity+$qty where item_code='$itemCode'";
             $conn->query($qtys);
-
             checkReturns($transId, $conn);
         }
     }
@@ -101,33 +116,34 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 
 function checkReturns($transId, $conn)
 {
-    // Use prepared statement to prevent SQL injection
+
     $sqlReturns = "SELECT
                     quantity,
                     return_quantity
                     FROM
-                        tbl_transaction
-                    WHERE transaction_id = $transId";
+                        tbl_transaction_detail
+                    WHERE transaction_no = $transId";
     $rs = $conn->query($sqlReturns);
     $row = $rs->fetch_assoc();
     if ($rs->num_rows > 0) {
         if ($row['return_quantity'] == $row['quantity']) {
-            $dates = date('Y-m-d');
-            $updateqty = "UPDATE tbl_transaction SET status=0,return_date='$dates' where transaction_id=$transId";
+            $updateqty = "UPDATE tbl_transaction_detail SET status=0 where transaction_no=$transId";
+            $updatehead= "UPDATE tbl_transaction_header SET status=0 where transaction_no=$transId";
             $conn->query($updateqty);
+            $conn->query($updatehead);
         } else {
-            $updateqty = "UPDATE tbl_transaction SET status=1 where transaction_id=$transId";
+            $updateqty = "UPDATE tbl_transaction_detail SET status=1 where transaction_no=$transId";
+            $updatehead= "UPDATE tbl_transaction_header SET status=1 where transaction_no=$transId";
             $conn->query($updateqty);
+            $conn->query($updatehead);
         }
+       
     }
 }
 
-// transid: col1,
-// qty : qty,
-// action: 'RETURN'
 
 
-  //status: 
+     //status for transaction header
     // 6-For Approval 
     // 5-Cancelled 
     // 4-Rejected
@@ -135,3 +151,13 @@ function checkReturns($transId, $conn)
     // 2-Waiting to returned  
     // 1-Partially Returned  
     // 0-Returned
+
+
+    //status for transaction details
+    // 4-For Approval
+    // 3-Waiting to claim
+    // 2-Waiting to returned  
+    // 1-Partially Returned  
+    // 0-Returned
+
+
