@@ -73,5 +73,5 @@
       }
     });
   }
-  setInterval(thecount, 100)
+  // setInterval(thecount, 100)
 </script>

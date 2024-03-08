@@ -239,28 +239,28 @@
           <div class="col-lg-6 d-flex flex-column align-items-center">
             <h3>Front ID</h3>
             <img id="FrontID" src="../static/images/no-image.png" width="230px" height="230px" style="max-height:230px; max-width:230px; min-width:230px; min-height:230px; border:2px solid gray">
-            
+
           </div>
           <div class="col-lg-6 d-flex flex-column align-items-center">
             <h3>Back ID</h3>
             <img id="BackID" src="../static/images/no-image.png" width="230px" height="230px" style="max-height:230px; max-width:230px; min-width:230px; min-height:230px; border:2px solid gray">
-            
+
           </div>
 
         </div>
       </div>
-        <div class="modal-footer">
-          <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
-            Cancel
-          </a>
-         
-        </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+          Cancel
+        </a>
+
       </div>
     </div>
   </div>
+</div>
 
 
-  <!-- modal size -->
+<!-- modal size -->
 <div class="modal modal-blur fade" id="modal-size" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
@@ -288,6 +288,64 @@
           Save
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- modal details -->
+<div class="modal modal-blur fade" id="modal-details" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title md-size-title">My Transaction Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="listjs">
+
+          <div id="pagination-container"></div>
+          <div id="table-default" class="table-responsive">
+            <table class="table" id="tables">
+              <thead>
+                <tr>
+                  <th>
+                    <button class="table-sort" data-sort="sort-department">
+                      Item Name
+                    </button>
+                  </th>
+
+                  <th>
+                    <button class="table-sort" data-sort="sort-status">
+                      Quantity
+                    </button>
+                  </th>
+                  <th>
+                    <button class="table-sort" data-sort="sort-status">
+                      Return Quantity
+                    </button>
+                  </th>
+                  <th>
+                    <button class="table-sort" data-sort="sort-status">
+                      Status
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="table-tbody thedata">           
+              </tbody>
+            </table>
+            <br>
+            <div class="btn-toolbar">
+              <p class="mb-0" id="listjs-showing-items-label">Showing 0 items</p>
+              <ul class="pagination ms-auto mb-0"></ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
     </div>
   </div>
 </div>

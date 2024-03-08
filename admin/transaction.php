@@ -40,7 +40,7 @@ if(!isset($_SESSION['admin_id'])){
         <div class="container-xl">
           <div class="card">
             <div class="card-body">
-              <div id="listjs">
+            <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
                   <div></div>
                   <div class="flex-shrink-0">
@@ -63,16 +63,7 @@ if(!isset($_SESSION['admin_id'])){
                             Borrower Name
                           </button>
                         </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-department">
-                            Item Name
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Quantity
-                          </button>
-                        </th>
+
                         <th>
                           <button class="table-sort" data-sort="sort-status">
                             Start Date
@@ -81,11 +72,6 @@ if(!isset($_SESSION['admin_id'])){
                         <th>
                           <button class="table-sort" data-sort="sort-status">
                             Expected Returned Date
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Returned Qty
                           </button>
                         </th>
                         <th>
@@ -103,50 +89,44 @@ if(!isset($_SESSION['admin_id'])){
                             Action
                           </button>
                         </th>
-                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
+                      $borrow = $_SESSION['borrower_id'];
                       $sql = "SELECT
-                      CONCAT(
-                          c.last_name,
-                          ', ',
-                          c.first_name,
-                          ' ',
-                          LEFT(C.middle_name, 1)
-                      ) AS fname,
-                      a.transaction_id,
-                      a.item_code,
-                      b.item_name,
-                      a.quantity,
+                      a.transaction_code,
                       a.start_date,
-                      a.return_date,
                       a.expected_return_date,
+                      a.return_date,
                       a.status,
-                      a.return_quantity
+                      CONCAT(
+                          b.first_name,
+                          ', ',
+                          b.last_name,
+                          ' ',
+                          LEFT(b.middle_name, 1)
+                      ) AS borrower_name
                   FROM
                       tbl_transaction a
-                  INNER JOIN tbl_item b ON
-                      a.item_code = b.item_code
-                  INNER JOIN tbl_borrower c ON
-                      a.borrower_id = c.borrower_id
-                  WHERE a.status IN (1,2,3,6)
+                  INNER JOIN tbl_borrower b ON
+                      a.borrower_id = b.borrower_id
+                  WHERE a.borrower_id = '$borrow'
+                  GROUP BY
+                      a.transaction_code
                   ORDER BY
                       a.date_created ASC";
                       $rs = $conn->query($sql);
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['transaction_id']?></td>
-                          <td class="sort-id"><?php echo $row['fname'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
+                          <td class="sort-id"><?php echo $row['transaction_code'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['borrower_name'] ?></td>
                           <td class="sort-department text-capitalize">
                             <?php
                             if ($row['start_date'] == '0000-00-00') {
-                              echo '----------';
+                              echo '-';
                             } else {
-                              echo date('M-d-Y',strtotime($row['start_date']));
+                              echo $row['start_date'];
                             }
 
                             ?>
@@ -154,66 +134,59 @@ if(!isset($_SESSION['admin_id'])){
                           <td class="sort-returnedate text-capitalize">
                             <?php
                             if ($row['expected_return_date'] == '0000-00-00') {
-                              echo '----------';
+                              echo '-';
                             } else {
-                              echo date('M-d-Y',strtotime($row['expected_return_date']));
+                              echo $row['expected_return_date'];
                             }
+
                             ?>
                           </td>
-                          <td><?php 
-                          if($row['return_quantity'] == 0){
-                            echo '----------';
-                          }else{
-                            echo $row['return_quantity'];
-                          }
-                          ?>
-                          
-                         </td>
-                          <td>
-                          <?php
+                          <td class="sort-returnedate text-capitalize">
+                            <?php
                             if ($row['return_date'] == '0000-00-00') {
-                              echo '----------';
+                              echo '-';
                             } else {
-                              echo date('M-d-Y',strtotime($row['return_date']));
+                              echo $row['return_date'];
                             }
+
                             ?>
                           </td>
                           <td class="sort-status">
+
                             <?php
-                            if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">RETURNED</span>';
-                            } else if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">PARTIALLY RETURNED</span>';
+                            if ($row['status'] == 1) {
+                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
                             } else if ($row['status'] == 2) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">WAITING TO RETURNED</span>';
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
                             } else if ($row['status'] == 3) {
-                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">WAITING TO RECEIVED</span>';
+                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
                             } else if ($row['status'] == 4) {
-                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">REJECTED</span>';
+                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">Rejected</span>';
                             } else if ($row['status'] == 5) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">CANCELLED</span>';
-                            } else {
-                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">FOR APPROVAL</span>';
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Cancelled</span>';
+                            } else if ($row['status'] == 6) {
+                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
+                            } else  if ($row['status'] == 0) {
+                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
                             }
                             ?>
                           </td>
                           <td>
+                            <a href="#" class="badge bg-primary details text-decoration-none" title="View Details">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-details" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M11.999 3l.001 17" />
+                                <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
+                              </svg>
+                            </a>
                             <?php
-                            if ($row['status'] == 1 || $row['status'] == 2) {
-                              echo '<a href="#" class="badge bg-info return text-decoration-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up-double" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 14l-4 -4l4 -4" /><path d="M8 14l-4 -4l4 -4" /><path d="M9 10h7a4 4 0 1 1 0 8h-1" /></svg></a>';
-                            } else if ($row['status'] == 3) {
-                              echo '<a href="#" class="badge bg-info receive   text-decoration-none" title="Receive"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hand-grab" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 11v-3.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M11 9.5v-3a1.5 1.5 0 0 1 3 0v3.5" /><path d="M14 7.5a1.5 1.5 0 0 1 3 0v2.5" /><path d="M17 9.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" /></svg></a>';
-                            } else if ($row['status'] == 6) {
-                              echo '<a href="#" class="badge bg-success approved text-decoration-none" title="Approved">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-up-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 3a3 3 0 0 1 2.995 2.824l.005 .176v4h2a3 3 0 0 1 2.98 2.65l.015 .174l.005 .176l-.02 .196l-1.006 5.032c-.381 1.626 -1.502 2.796 -2.81 2.78l-.164 -.008h-8a1 1 0 0 1 -.993 -.883l-.007 -.117l.001 -9.536a1 1 0 0 1 .5 -.865a2.998 2.998 0 0 0 1.492 -2.397l.007 -.202v-1a3 3 0 0 1 3 -3z" stroke-width="0" fill="currentColor" /><path d="M5 10a1 1 0 0 1 .993 .883l.007 .117v9a1 1 0 0 1 -.883 .993l-.117 .007h-1a2 2 0 0 1 -1.995 -1.85l-.005 -.15v-7a2 2 0 0 1 1.85 -1.995l.15 -.005h1z" stroke-width="0" fill="currentColor" /></svg>
-                              </a> | 
-                              <a href="#" class="badge bg-danger reject text-decoration-none" title="Reject">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-down-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 21.008a3 3 0 0 0 2.995 -2.823l.005 -.177v-4h2a3 3 0 0 0 2.98 -2.65l.015 -.173l.005 -.177l-.02 -.196l-1.006 -5.032c-.381 -1.625 -1.502 -2.796 -2.81 -2.78l-.164 .008h-8a1 1 0 0 0 -.993 .884l-.007 .116l.001 9.536a1 1 0 0 0 .5 .866a2.998 2.998 0 0 1 1.492 2.396l.007 .202v1a3 3 0 0 0 3 3z" stroke-width="0" fill="currentColor" /><path d="M5 14.008a1 1 0 0 0 .993 -.883l.007 -.117v-9a1 1 0 0 0 -.883 -.993l-.117 -.007h-1a2 2 0 0 0 -1.995 1.852l-.005 .15v7a2 2 0 0 0 1.85 1.994l.15 .005h1z" stroke-width="0" fill="currentColor" /></svg>
+                            if ($row['status'] == 3 ||  $row['status'] == 6) {
+                              echo ' <a href="#" class="badge bg-danger cancel text-decoration-none" title="Reject">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>
                               </a>';
                             }
                             ?>
                           </td>
-                          <td class="d-none"><?php echo $row['item_code'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
@@ -224,6 +197,7 @@ if(!isset($_SESSION['admin_id'])){
                     <ul class="pagination ms-auto mb-0"></ul>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>

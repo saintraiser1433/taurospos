@@ -45,14 +45,14 @@ if (!isset($_SESSION['borrower_id'])) {
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
                   <div class="btn-list">
-                    <a href="#" class="btn btn-primary d-none d-sm-inline-block proceed">
+                    <button type="button" class="btn btn-primary d-none d-sm-inline-block proceed">
                       <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
                       </svg>
                       Process Borrow
-                    </a>
+                    </button>
 
                   </div>
                   <div class="flex-shrink-0">
@@ -150,22 +150,34 @@ if (!isset($_SESSION['borrower_id'])) {
       });
     });
 
-    $(document).on('click', '.remove', function(e) {
+    $(document).on('click', '.proceed', function(e) {
       e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(0)").text();
-      $.ajax({
-        method: "POST",
-        url: "../ajax/cart.php",
-        data: {
-          item_code: col1,
-          action: 'REMOVE'
-        },
-        success: function(html) {
-          toastr.success("Successfully remove item to cart");
-          location.reload();
-        }
-      });
+      swal({
+          title: "Are you sure?",
+          text: "You want to borrow this items?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                trans_code : '<?php echo $trn?>',
+                action:'ADD'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  window.location.href="transaction.php";
+                });
+              }
+            });
+          }
+        });
     });
   });
 </script>

@@ -1,7 +1,7 @@
-<?php 
+<?php
 include '../connection.php';
 
-if(!isset($_SESSION['borrower_id'])){
+if (!isset($_SESSION['borrower_id'])) {
   header("Location:../index.php");
 }
 
@@ -12,6 +12,7 @@ if(!isset($_SESSION['borrower_id'])){
 <html lang="en">
 <?php include '../components/head.php' ?>
 <?php include '../components/script.php' ?>
+
 <body class=" layout-fluid">
 
   <div class="page">
@@ -61,14 +62,10 @@ if(!isset($_SESSION['borrower_id'])){
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-department">
-                            Item Name
+                            Borrower Name
                           </button>
                         </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Quantity
-                          </button>
-                        </th>
+
                         <th>
                           <button class="table-sort" data-sort="sort-status">
                             Start Date
@@ -76,7 +73,12 @@ if(!isset($_SESSION['borrower_id'])){
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-status">
-                            Returned Date
+                            Expected Returned Date
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Return Date
                           </button>
                         </th>
                         <th>
@@ -93,26 +95,34 @@ if(!isset($_SESSION['borrower_id'])){
                     </thead>
                     <tbody class="table-tbody">
                       <?php
+                      $borrow = $_SESSION['borrower_id'];
                       $sql = "SELECT
-                       a.transaction_id,
-                       a.item_code,
-                       b.item_name,
-                       a.quantity,
-                       a.start_date,
-                       a.expected_return_date,
-                       a.status
-                   FROM
-                       tbl_transaction a
-                   INNER JOIN tbl_item b ON
-                       a.item_code = b.item_code
-                   ORDER BY
-                       a.date_created ASC";
+                      a.transaction_code,
+                      a.start_date,
+                      a.expected_return_date,
+                      a.return_date,
+                      a.status,
+                      CONCAT(
+                          b.first_name,
+                          ', ',
+                          b.last_name,
+                          ' ',
+                          LEFT(b.middle_name, 1)
+                      ) AS borrower_name
+                  FROM
+                      tbl_transaction a
+                  INNER JOIN tbl_borrower b ON
+                      a.borrower_id = b.borrower_id
+                  WHERE a.borrower_id = '$borrow'
+                  GROUP BY
+                      a.transaction_code
+                  ORDER BY
+                      a.date_created ASC";
                       $rs = $conn->query($sql);
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['transaction_id'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['quantity'] ?></td>
+                          <td class="sort-id"><?php echo $row['transaction_code'] ?></td>
+                          <td class="sort-department text-capitalize"><?php echo $row['borrower_name'] ?></td>
                           <td class="sort-department text-capitalize">
                             <?php
                             if ($row['start_date'] == '0000-00-00') {
@@ -124,7 +134,7 @@ if(!isset($_SESSION['borrower_id'])){
                             ?>
                           </td>
                           <td class="sort-returnedate text-capitalize">
-                          <?php
+                            <?php
                             if ($row['expected_return_date'] == '0000-00-00') {
                               echo '-';
                             } else {
@@ -133,7 +143,18 @@ if(!isset($_SESSION['borrower_id'])){
 
                             ?>
                           </td>
+                          <td class="sort-returnedate text-capitalize">
+                            <?php
+                            if ($row['return_date'] == '0000-00-00') {
+                              echo '-';
+                            } else {
+                              echo $row['return_date'];
+                            }
+
+                            ?>
+                          </td>
                           <td class="sort-status">
+
                             <?php
                             if ($row['status'] == 1) {
                               echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
@@ -147,21 +168,27 @@ if(!isset($_SESSION['borrower_id'])){
                               echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Cancelled</span>';
                             } else if ($row['status'] == 6) {
                               echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
-                            }else  if ($row['status'] == 0) {
+                            } else  if ($row['status'] == 0) {
                               echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
                             }
 
-                            
+
                             ?>
                           </td>
                           <td>
+                            <a href="#" class="badge bg-primary details text-decoration-none" title="View Details">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-details" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M11.999 3l.001 17" />
+                                <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
+                              </svg>
+                            </a>
                             <?php
                             if ($row['status'] == 3 ||  $row['status'] == 6) {
                               echo ' <a href="#" class="badge bg-danger cancel text-decoration-none" title="Reject">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>
                               </a>';
                             }
-
                             ?>
                           </td>
                         </tr>
@@ -222,6 +249,37 @@ if(!isset($_SESSION['borrower_id'])){
             });
           }
         });
+    });
+    $(document).on('click', '.details', function() {
+      $tr = $(this).closest('tr');
+      var data = $tr.children("td").map(function() {
+        return $(this).text();
+      }).get();
+
+      $.ajax({
+        method: "POST",
+        url: "../ajax/transborrow.php",
+        data: {
+          trans_code: data[0],
+          action: 'GET'
+        },
+        success: function(response) {
+          $('#modal-details').modal('show');
+          // Clear existing data first
+          $('.thedata').empty();
+          // Iterate over each object in the response array
+          for (var i = 0; i < response.length; i++) {
+            var item = response[i];
+            // Append a new row with data from the current object
+            $('.thedata').append(
+              `<tr><td>${item.item_name}</td><td>${item.qty}</td><td>${item.return_quantity}</td><td>Complete</td></tr>`
+            );
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error(error); // Log any errors for debugging
+        }
+      });
     });
   });
 </script>

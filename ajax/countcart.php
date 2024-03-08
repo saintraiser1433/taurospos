@@ -12,8 +12,6 @@ if ($_SERVER["REQUEST_METHOD"] == 'GET') {
     $rs = $conn->query($sql);
     $row = $rs->fetch_assoc();
     if ($rs->num_rows > 0) {
-        echo $row['total_count'];
-    } else {
-        echo 0;
-    }
+        echo $row['total_count'] ?? 0;
+    } 
 }

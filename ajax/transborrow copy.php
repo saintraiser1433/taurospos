@@ -3,59 +3,23 @@ include '../connection.php';
 $action = $_POST['action'];
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 
-    $trans = @$_POST['trans_code'];
-    $borrowId = @$_SESSION['borrower_id'];
+    $trans = @$_POST['transaction_no'];
+    $borrowId = @$_POST['borrowerId'];
     $itemCode = @$_POST['item_code'];
     $counter = @$_POST['counter'];
     $rtndate = @$_POST['rtndate'];
-    if ($action == 'GET') {
-        $sqlt = "SELECT
-        b.item_name,
-        SUM(a.quantity) as qty,
-        a.return_quantity
-    FROM
-        tbl_transaction a
-    INNER JOIN tbl_item b ON
-        a.item_code = b.item_code
-    WHERE
-        a.transaction_code = '$trans'
-    group by a.item_code    
-    ";
-        $rs = $conn->query($sqlt);
-        $response = array();
-        if ($rs) {
-            while ($row = $rs->fetch_assoc()) {
-                // Assuming your resident table has 'id', 'name', and 'age' columns
-                $response[] = $row;
-            }
-        }
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    } else if ($action == 'ADD') {
-        $sql = "INSERT INTO tbl_transaction(
-            transaction_code,
+
+    if ($action == 'ADD') {
+        $sql = "INSERT INTO tbl_transaction 
+        (transaction_id,
             borrower_id,
             item_code,
             quantity,
-            STATUS
-        )
-        SELECT
-            $trans,
-            borrower_id,
-            item_code,
-            sum(quantity) as qty,
-            6
-        FROM
-            tbl_cart
-        WHERE
-            borrower_id = '$borrowId'
-        GROUP BY item_code  
-        ";
+            status) 
+        VALUES ($trans,'$borrowId','$itemCode',$counter,6)";
         $conn->query($sql);
-
-        $delcart = "DELETE FROM tbl_cart where borrower_id='$borrowId'";
-        $conn->query($delcart);
-    } else if ($action == 'APPROVED') {
+    }
+    if ($action == 'APPROVED') {
         $transId = $_POST['transid'];
         $sql = "UPDATE tbl_transaction SET status=3 where transaction_id=$transId";
         $conn->query($sql);
@@ -96,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 
             checkReturns($transId, $conn);
         }
+       
     }
 }
 
@@ -111,14 +76,14 @@ function checkReturns($transId, $conn)
     $rs = $conn->query($sqlReturns);
     $row = $rs->fetch_assoc();
     if ($rs->num_rows > 0) {
-        if ($row['return_quantity'] == $row['quantity']) {
+        if($row['return_quantity'] == $row['quantity']){
             $dates = date('Y-m-d');
             $updateqty = "UPDATE tbl_transaction SET status=0,return_date='$dates' where transaction_id=$transId";
             $conn->query($updateqty);
-        } else {
+        }else{
             $updateqty = "UPDATE tbl_transaction SET status=1 where transaction_id=$transId";
             $conn->query($updateqty);
-        }
+        } 
     }
 }
 
