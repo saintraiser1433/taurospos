@@ -20,26 +20,29 @@ if (!isset($_SESSION['borrower_id'])) {
     <div class="page-wrapper">
       <!-- Page header -->
       <div class="page-header d-print-none">
-        <!-- <div class="container-xl">
-          <div class="row align-items-center">
-            <div class="col-5"> -->
-        <!-- Page pre-title -->
-        <!-- <div class="page-pretitle">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <!-- Page pre-title -->
+              <div class="page-pretitle">
                 Overview
               </div>
               <h2 class="page-title">
-                All Items
+                List of Items For Borrow
               </h2>
             </div>
 
           </div>
-        </div> -->
+        </div>
+      </div>
 
         <!-- Page body -->
         <div class="page-body">
           <div class="container-xl">
             <div class="row">
+
               <div class="card">
+                <div class="card-status-bottom bg-success"></div>
                 <div class="card-header">
 
                   <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">

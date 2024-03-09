@@ -31,7 +31,7 @@ if (!isset($_GET['code'])) {
           <div class="row row-deck row-cards d-flex justify-content-center my-auto mx-auto">
             <div class="col-lg-6">
               <div class="card ">
-                <div class="card-status-bottom bg-green"></div>
+                <div class="card-status-bottom bg-success"></div>
                 <div class="card-header">
                   <div>
                     <h3 class="card-title">
@@ -131,7 +131,7 @@ if (!isset($_GET['code'])) {
 </html>
 
 <script>
-   $(window).bind('unload', function() {
+  $(window).bind('unload', function() {
     $.ajax({
       url: "../ajax/setUpdate.php",
       method: "GET",

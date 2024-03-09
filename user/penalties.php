@@ -15,7 +15,7 @@ if (!isset($_SESSION['borrower_id'])) {
   <div class="page">
     <!-- Navbar -->
     <?php include '../components/navbar.php' ?>
-    <?php include '../components/sidebar.php' ?>
+    <?php include '../components/usersidebar.php' ?>
     <div class="page-wrapper">
       <!-- Page header -->
       <div class="page-header d-print-none">
@@ -31,7 +31,7 @@ if (!isset($_SESSION['borrower_id'])) {
               </h2>
             </div>
             <!-- Page title actions -->
-           
+
           </div>
         </div>
       </div>
@@ -39,6 +39,7 @@ if (!isset($_SESSION['borrower_id'])) {
       <div class="page-body">
         <div class="container-xl">
           <div class="card">
+            <div class="card-status-bottom bg-success"></div>
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
@@ -79,7 +80,7 @@ if (!isset($_SESSION['borrower_id'])) {
                           </button>
                         </th>
                         <th class="d-none"></th>
-                       
+
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
@@ -115,15 +116,15 @@ if (!isset($_SESSION['borrower_id'])) {
                           <td class="sort-category text-capitalize"><?php echo $row['transaction_no'] ?></td>
                           <td class="sort-category text-capitalize"><?php echo $row['borrower_name'] ?></td>
                           <td class="sort-category text-capitalize"><?php echo $row['amount'] ?></td>
-                          <td class="sort-category text-capitalize"><?php 
-                             if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">NOT PAID</span>';
-                            } else if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">PAID</span>'; 
-                            }
-                              ?>
-                              </td>
-                         
+                          <td class="sort-category text-capitalize"><?php
+                                                                    if ($row['status'] == 0) {
+                                                                      echo '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">NOT PAID</span>';
+                                                                    } else if ($row['status'] == 1) {
+                                                                      echo '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">PAID</span>';
+                                                                    }
+                                                                    ?>
+                          </td>
+
                           <td class="d-none"><?php echo $row['penalty_id'] ?></td>
                         </tr>
 
@@ -188,7 +189,7 @@ if (!isset($_SESSION['borrower_id'])) {
               url: "../ajax/penalty.php",
               data: {
                 penaltyId: col1,
-                action:'ADD',
+                action: 'ADD',
               },
               success: function(html) {
                 swal("Success", {

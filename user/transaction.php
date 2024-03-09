@@ -40,6 +40,7 @@ if (!isset($_SESSION['borrower_id'])) {
       <div class="page-body">
         <div class="container-xl">
           <div class="card">
+            <div class="card-status-bottom bg-success"></div>
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
@@ -92,95 +93,8 @@ if (!isset($_SESSION['borrower_id'])) {
                         </th>
                       </tr>
                     </thead>
-                    <tbody class="table-tbody">
-                      <?php
-                      $borrow = $_SESSION['borrower_id'];
-                      $sql = "SELECT
-                      CONCAT(
-                          b.first_name,
-                          ', ',
-                          b.last_name,
-                          ' ',
-                          LEFT(b.middle_name, 1)
-                      ) AS borrower_name,
-                      a.transaction_no,
-                      a.start_date,
-                      a.expected_return_date,
-                      a.return_date,
-                      a.status
-                  FROM
-                      tbl_transaction_header a
-                  INNER JOIN tbl_borrower b ON
-                      a.borrower_id = b.borrower_id
-                  WHERE a.status IN(1,2,3,6) and a.borrower_id='$borrow'
-                  ORDER BY
-                      a.date_created
-                  DESC";
-                      $rs = $conn->query($sql);
-                      foreach ($rs as $row) { ?>
-                        <tr>
-                          <td class="sort-id"><?php echo $row['transaction_no'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['borrower_name'] ?></td>
-                          <td class="sort-department text-capitalize">
-                            <?php
-                            if ($row['start_date'] == '0000-00-00') {
-                              echo '-';
-                            } else {
-                              echo date('M-d-Y', strtotime($row['start_date']));
-                            }
+                    <tbody class="table-tbody" id="append-transaction">
 
-                            ?>
-                          </td>
-                          <td class="sort-returndate text-capitalize">
-                            <?php
-                            if ($row['expected_return_date'] == '0000-00-00') {
-                              echo '-';
-                            } else {
-                              echo date('M-d-Y', strtotime($row['expected_return_date']));
-                            }
-
-                            ?>
-                          </td>
-                          <td class="sort-returnedate text-capitalize">
-                            <?php
-                            if ($row['return_date'] == '0000-00-00') {
-                              echo '-';
-                            } else {
-                              echo date('M-d-Y', strtotime($row['return_date']));
-                            }
-                            ?>
-                          </td>
-                          <td class="sort-status">
-                            <?php
-                            if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
-                            } else if ($row['status'] == 2) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
-                            } else if ($row['status'] == 3) {
-                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
-                            } else if ($row['status'] == 6) {
-                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
-                            }
-                            ?>
-                          </td>
-                          <td>
-                            <a href="#" class="badge bg-primary details text-decoration-none" title="View Details">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-details" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M11.999 3l.001 17" />
-                                <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
-                              </svg>
-                            </a>
-                            <?php
-                            if ($row['status'] == 3 ||  $row['status'] == 6) {
-                              echo ' <a href="#" class="badge bg-danger cancel text-decoration-none" title="Reject">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>
-                              </a>';
-                            }
-                            ?>
-                          </td>
-                        </tr>
-                      <?php } ?>
                     </tbody>
                   </table>
                   <br>
@@ -215,10 +129,54 @@ if (!isset($_SESSION['borrower_id'])) {
         borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
       },
       success: function(html) {
-
+      
       }
     });
   });
+
+  function getTransaction() {
+    $.ajax({
+      url: "../ajax/realtimetransact.php",
+      method: "POST",
+      data: {
+        borrower_id: '<?php echo $_SESSION['borrower_id'] ?>'
+      },
+      success: function(html) {
+        $('#append-transaction').empty();
+        for (var i = 0; i < html.length; i++) {
+          var item = html[i];
+
+
+          $('#append-transaction').append(
+            `
+            <tr>
+            <td class="sort-id">${item.transaction_no}</td>
+            <td class="sort-id text-capitalize">${item.borrower_name}</td>
+            <td class="sort-id text-capitalize">${item.start_date}</td>
+            <td class="sort-id text-capitalize">${item.expected_return_date}</td>
+            <td class="sort-id text-capitalize">${item.return_date}</td>
+            <td class="sort-id text-capitalize">${item.status}</td>
+            <td><a href="#" class="badge bg-primary details text-decoration-none" title="View Details">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-details" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M11.999 3l.001 17" />
+                                <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
+                              </svg>
+                            </a></td>
+            <td></td>
+            </tr>
+            `
+          );
+
+
+
+        }
+      }
+    });
+  }
+
+  setInterval(getTransaction,500)
+
   $(document).ready(function() {
     $(document).on('click', '.cancel', function(e) {
       e.preventDefault();

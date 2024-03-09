@@ -9,6 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $counter = @$_POST['counter'];
     $rtndate = @$_POST['rtndate'];
     $transId = @$_POST['transid'];
+    $getBorrowId = @$_POST['getBorrowID'];
     $qty = @$_POST['qty'];
     if ($action == 'GET') {
         $sqlt = "SELECT
@@ -29,6 +30,38 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     WHERE
         a.transaction_no = '$trans'
     group by a.item_code";
+        $rs = $conn->query($sqlt);
+        $response = array();
+        if ($rs) {
+            while ($row = $rs->fetch_assoc()) {
+                // Assuming your resident table has 'id', 'name', and 'age' columns
+                $response[] = $row;
+            }
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    } else if ($action == 'SHOW-TRANSACTION') {
+        $sqlt = "SELECT
+                CONCAT(
+                    tb.first_name,
+                    ', ',
+                    tb.last_name,
+                    ' ',
+                    LEFT(tb.middle_name, 1)
+                ) AS borrower_name,
+                tth.transaction_no,
+                tth.status,
+                tth.expected_return_date,
+                tth.start_date,
+                tth.return_date,
+                tth.borrower_id
+            FROM
+                tbl_transaction_header tth
+            LEFT JOIN tbl_borrower tb ON
+                tth.borrower_id = tb.borrower_id
+            WHERE tth.borrower_id = '$getBorrowId'
+            ORDER BY
+                tth.date_created DESC";
         $rs = $conn->query($sqlt);
         $response = array();
         if ($rs) {

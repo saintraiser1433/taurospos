@@ -9,7 +9,7 @@ if (isset($_POST['submit'])) {
         $rs = $conn->query($sql);
         if ($rs->num_rows > 0) {
             $row = $rs->fetch_assoc();
-            if ($row['stat'] == 1) {
+            if ($row['login_session'] == 1) {
                 $_SESSION['response'] = 'Existing Active Session';
                 $_SESSION['type'] = 'warning';
             } else {
@@ -37,7 +37,7 @@ if (isset($_POST['submit'])) {
                 $_SESSION['response'] = 'Your account is In-active kindly contact the administrator regarding in your account';
                 $_SESSION['type'] = 'warning';
             } else {
-                if ($row['stat'] == 1) {
+                if ($row['login_session'] == 1) {
                     $_SESSION['response'] = 'Existing Active Session';
                     $_SESSION['type'] = 'warning';
                 } else {

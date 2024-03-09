@@ -459,3 +459,67 @@
     </div>
   </div>
 </div>
+
+
+<!-- modal details -->
+<div class="modal modal-blur fade" id="modal-trans" data-bs-backdrop='static' data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title md-trans-title">Transaction History</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="location.reload()"></button>
+      </div>
+      <div class="modal-body">
+        <div id="listjs">
+          <div id="pagination-container"></div>
+          <div id="table-default" class="table-responsive">
+            <table class="table" id="tables">
+              <thead>
+                <tr>
+                  <th id="idname">
+                    <button class="table-sort" data-sort="sort-department">
+                      Transaction #
+                    </button>
+                  </th>
+
+                  <th id="idquantity">
+                    <button class="table-sort" data-sort="sort-status">
+                      Borrower Name
+                    </button>
+                  </th>
+                  <th id="idquantity">
+                    <button class="table-sort" data-sort="sort-status">
+                      Start Date
+                    </button>
+                  </th>
+                  <th id="idquantity">
+                    <button class="table-sort" data-sort="sort-status">
+                      Expected Return Date
+                    </button>
+                  </th>
+                  <th id="idquantity">
+                    <button class="table-sort" data-sort="sort-status">
+                      Return Date
+                    </button>
+                  </th>
+                  <th id="idreturn">
+                    <button class="table-sort" data-sort="sort-status">
+                      Status
+                    </button>
+                  </th>
+                  <th id="idstatus">
+                    <button class="table-sort" data-sort="sort-status">
+                      Actions
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="table-tbody" id="mytransaction">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

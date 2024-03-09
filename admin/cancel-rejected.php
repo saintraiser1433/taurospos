@@ -11,7 +11,6 @@ if (!isset($_SESSION['admin_id'])) {
 
 <html lang="en">
 <?php include '../components/head.php' ?>
-<?php include '../components/script.php' ?>
 
 <body class="layout-fluid">
 
@@ -41,6 +40,7 @@ if (!isset($_SESSION['admin_id'])) {
       <div class="page-body">
         <div class="container-xl">
           <div class="card">
+            <div class="card-status-bottom bg-success"></div>
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
@@ -140,7 +140,7 @@ if (!isset($_SESSION['admin_id'])) {
     </div>
   </div>
   <?php include '../components/modal.php' ?>
-
+  <?php include '../components/script.php' ?>
 
 
 </body>

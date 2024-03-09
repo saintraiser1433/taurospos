@@ -51,6 +51,7 @@ if (!isset($_SESSION['admin_id'])) {
       <div class="page-body">
         <div class="container-xl">
           <div class="card">
+            <div class="card-status-bottom bg-success"></div>
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">

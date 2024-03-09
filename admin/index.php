@@ -58,7 +58,9 @@ $monthData = array_column($resultArray, 'borrow');
                         <div class="col-12">
                             <div class="row row-cards">
                                 <div class="col-sm-6 col-lg-3">
+
                                     <div class="card card-sm">
+                                        <div class="card-status-bottom bg-success"></div>
                                         <div class="card-body">
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
@@ -92,6 +94,7 @@ $monthData = array_column($resultArray, 'borrow');
                                 </div>
                                 <div class="col-sm-6 col-lg-3">
                                     <div class="card card-sm">
+                                        <div class="card-status-bottom bg-success"></div>
                                         <div class="card-body">
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
@@ -120,6 +123,7 @@ $monthData = array_column($resultArray, 'borrow');
                                 </div>
                                 <div class="col-sm-6 col-lg-3">
                                     <div class="card card-sm">
+                                        <div class="card-status-bottom bg-success"></div>
                                         <div class="card-body">
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
@@ -152,6 +156,7 @@ $monthData = array_column($resultArray, 'borrow');
                                 </div>
                                 <div class="col-sm-6 col-lg-3">
                                     <div class="card card-sm">
+                                        <div class="card-status-bottom bg-success"></div>
                                         <div class="card-body">
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
@@ -185,6 +190,7 @@ $monthData = array_column($resultArray, 'borrow');
                         </div>
                         <div class="col-lg-12">
                             <div class="card">
+                                <div class="card-status-bottom bg-success"></div>
                                 <div class="card-body">
                                     <h3 class="card-title">Traffic summary</h3>
                                     <div id="chart-mentions" class="chart-lg"></div>
@@ -200,26 +206,26 @@ $monthData = array_column($resultArray, 'borrow');
     </div>
 
     <?php include '../components/script.php' ?>
-    <script src="../dist/libs/apexcharts/dist/apexcharts.min.js?1684106062" defer></script>
+    <?php include '../components/modal.php' ?>
 </body>
 
 </html>
-
+<script src="../dist/libs/apexcharts/dist/apexcharts.min.js?1684106062" defer></script>
 <script>
     // @formatter:off
     $(window).bind('unload', function() {
-     $.ajax({
-      url: "../ajax/setUpdate.php",
-      method: "GET",
-      data: {
-        type: 1,
-        admin_id: <?php echo $_SESSION['admin_id'] ?>
-      },
-      success: function(html) {
+        $.ajax({
+            url: "../ajax/setUpdate.php",
+            method: "GET",
+            data: {
+                type: 1,
+                admin_id: <?php echo $_SESSION['admin_id'] ?>
+            },
+            success: function(html) {
 
-      }
+            }
+        });
     });
-  });
     document.addEventListener("DOMContentLoaded", function() {
         var cntData = <?php echo json_encode($cntData); ?>;
         var monthData = <?php echo json_encode($monthData); ?>;

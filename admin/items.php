@@ -52,6 +52,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
       <div class="page-body">
         <div class="container-xl">
           <div class="card">
+            <div class="card-status-bottom bg-success"></div>
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
@@ -148,8 +149,8 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 
                           </td>
                           <td>
-                            <?php 
-                            if($row['status'] == 1){
+                            <?php
+                            if ($row['status'] == 1) {
                               echo '
                               <a href="#" class="badge bg-yellow edit">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -171,9 +172,9 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                             </a>
                               ';
                             }
-                            
+
                             ?>
-                          
+
                           </td>
                         </tr>
                       <?php } ?>
@@ -203,7 +204,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 
 <script>
   $(window).bind('unload', function() {
-     $.ajax({
+    $.ajax({
       url: "../ajax/setUpdate.php",
       method: "GET",
       data: {
