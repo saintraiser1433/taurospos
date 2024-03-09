@@ -1,10 +1,8 @@
-<?php
-include '../connection.php';
-$trn = substr(str_shuffle("01234567894578942"), 0, 8);
-if (!isset($_SESSION['borrower_id'])) {
+<?php include '../connection.php';
+if (!isset($_SESSION['admin_id'])) {
   header("Location:../index.php");
 }
-$id = $_SESSION['borrower_id'];
+
 ?>
 
 <!doctype html>
@@ -16,8 +14,8 @@ $id = $_SESSION['borrower_id'];
 
   <div class="page">
     <!-- Navbar -->
-    <?php include '../components/navbar.php' ?>
-    <?php include '../components/usersidebar.php' ?>
+    <?php include '../components/navbaradmin.php' ?>
+    <?php include '../components/sidebar.php' ?>
     <div class="page-wrapper">
       <!-- Page header -->
       <div class="page-header d-print-none">
@@ -29,9 +27,10 @@ $id = $_SESSION['borrower_id'];
                 Overview
               </div>
               <h2 class="page-title">
-                My Cart
+                Retirement
               </h2>
             </div>
+            <!-- Page title actions -->
 
           </div>
         </div>
@@ -43,25 +42,7 @@ $id = $_SESSION['borrower_id'];
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
-                  <div class="btn-list">
-                    <?php
-                    $sqlt = "SELECT * FROM tbl_cart where borrower_id='$id'";
-                    $rst = $conn->query($sqlt);
-                    if ($rst->num_rows > 0) {
-                      echo '<button type="button" class="btn btn-primary d-none d-sm-inline-block proceed">
-                      <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
-                      </svg>
-                      Process Borrow
-                    </button>';
-                    }
-
-                    ?>
-
-
-                  </div>
+                  <div></div>
                   <div class="flex-shrink-0">
                     <input class="form-control listjs-search" id="search-input" placeholder="Search" style="max-width: 200px;" />
                   </div>
@@ -74,46 +55,67 @@ $id = $_SESSION['borrower_id'];
                       <tr>
                         <th>
                           <button class="table-sort" data-sort="sort-id">
+                            #
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
                             Item Code
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-department">
+                          <button class="table-sort" data-sort="sort-category">
                             Item Name
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-status">
+                          <button class="table-sort" data-sort="sort-category">
                             Quantity
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort">
-                            Action
+                          <button class="table-sort" data-sort="sort-category">
+                            Date Retirement
                           </button>
                         </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
+                            Remarks
+                          </button>
+                        </th>
+
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-
-                      $sql = "SELECT b.item_code,b.item_name,SUM(a.quantity) as qtysum FROM tbl_cart a INNER JOIN tbl_item b ON a.item_code = b.item_code where a.borrower_id='$id' group by a.item_code";
+                      $sql = "SELECT
+                      a.item_code,
+                      b.item_name,
+                      a.quantity,
+                      a.remarks,
+                      a.date_retirement
+                  FROM
+                      tbl_retirement a
+                  LEFT JOIN tbl_item b ON
+                      a.item_code = b.item_code
+                  ORDER BY
+                      a.date_retirement
+                  DESC";
                       $rs = $conn->query($sql);
+                      $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['item_code'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['qtysum'] ?></td>
-                          <td><a href="#" class="badge bg-danger remove text-decoration-none" title="remove">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                                <path d="M10 10l4 4m0 -4l-4 4" />
-                              </svg>
-                            </a>
-                          </td>
+                          <td class="sort-id"><?php echo $i++ ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['item_code'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['item_name'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['quantity'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo date('M-d-Y', strtotime($row['date_retirement'])); ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['remarks'] ?></td>
                         </tr>
+
                       <?php } ?>
+
+
                     </tbody>
                   </table>
                   <br>
@@ -137,44 +139,75 @@ $id = $_SESSION['borrower_id'];
 </body>
 
 </html>
+
 <script>
   $(window).bind('unload', function() {
     $.ajax({
       url: "../ajax/setUpdate.php",
       method: "GET",
       data: {
-        type: 2,
-        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
+        type: 1,
+        admin_id: <?php echo $_SESSION['admin_id'] ?>
       },
       success: function(html) {
 
       }
     });
   });
+  let counter = parseInt($('#counter').val());
+  let curStock = 0;
+
+  $('#stockshow').hide();
+
+  $('#add').on('click', function() {
+    counter += 1;
+    $('#counter').val(counter)
+    $('#newstock').html(counter + curStock);
+    if (counter == 0) {
+      $('#saveStock').attr('disabled', true);
+    } else {
+      $('#saveStock').attr('disabled', false);
+    }
+  });
+
+  $('#minus').on('click', function() {
+    counter -= 1;
+
+    if (counter < 0) {
+      counter = 0;
+    }
+    if (counter == 0) {
+      $('#saveStock').attr('disabled', true);
+    } else {
+      $('#saveStock').attr('disabled', false);
+    }
+    $('#counter').val(counter)
+    $('#newstock').html(counter + curStock);
+
+
+  });
   $(document).ready(function() {
-    $(document).on('click', '.remove', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(0)").text();
-      $.ajax({
-        method: "POST",
-        url: "../ajax/cart.php",
-        data: {
-          item_code: col1,
-          action: 'REMOVE'
-        },
-        success: function(html) {
-          toastr.success("Successfully remove item to cart");
-          location.reload();
-        }
-      });
+    $(document).on('click', '.add', function() {
+      $('#modal-stockin').modal('show');
     });
 
-    $(document).on('click', '.proceed', function(e) {
+    $(document).on('change', '#selectItemName', function() {
+      var value2 = $(this).find(':selected').data('qty');
+      curStock = value2;
+      $('#curstock').html(curStock);
+      $('#newstock').html(curStock);
+      $('#stockshow').show();
+    });
+
+
+
+
+    $(document).on('click', '#saveStock', function(e) {
       e.preventDefault();
+      var itemCode = $('#selectItemName').val();
       swal({
           title: "Are you sure?",
-          text: "You want to borrow this items?",
+          text: "You want to add quantity of this item?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -183,21 +216,25 @@ $id = $_SESSION['borrower_id'];
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/transborrow.php",
+              url: "../ajax/inventory.php",
               data: {
-                trans_code: '<?php echo $trn ?>',
-                action: 'ADD'
+                itemCode: itemCode,
+                qty: curStock,
+                addedqty: counter,
+                action: 'STOCKIN'
               },
               success: function(html) {
                 swal("Success", {
                   icon: "success",
                 }).then((value) => {
-                  window.location.href = "transaction.php";
+                  location.reload();
                 });
               }
             });
+
           }
         });
     });
+
   });
 </script>

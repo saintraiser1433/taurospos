@@ -17,11 +17,15 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         a.return_quantity,
         a.status,
         a.trans_item_id,
-        a.item_code
+        a.item_code,
+        a.transaction_no,
+        c.borrower_id
     FROM
         tbl_transaction_detail a
     INNER JOIN tbl_item b ON
         a.item_code = b.item_code
+    INNER JOIN tbl_transaction_header c ON
+        a.transaction_no = c.transaction_no
     WHERE
         a.transaction_no = '$trans'
     group by a.item_code";
@@ -62,27 +66,27 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         $conn->query($delcart);
     } else if ($action == 'APPROVED') {
         //for approve
-        $sqls = "UPDATE tbl_transaction_header SET status=3 where transaction_no=$transId";
-        $sql = "UPDATE tbl_transaction_detail SET status=3 where transaction_no=$transId";
+        $sqls = "UPDATE tbl_transaction_header SET status=3 where transaction_no=$trans";
+        $sql = "UPDATE tbl_transaction_detail SET status=3 where transaction_no=$trans";
         $conn->query($sqls);
         $conn->query($sql);
     } else if ($action == 'REJECT') {
         //for reject
-        $sqlt = "UPDATE tbl_transaction_header SET status=4 where transaction_no=$transId";
-        $sql = "UPDATE tbl_transaction_detail SET status=5 where transaction_no=$transId";
+        $sqlt = "UPDATE tbl_transaction_header SET status=4 where transaction_no=$trans";
+        $sql = "UPDATE tbl_transaction_detail SET status=5 where transaction_no=$trans";
         $conn->query($sql);
         $conn->query($sqlt);
     } else if ($action == 'RECEIVE') {
         //for receive
         $startDate = date('Y-m-d');
         $return = date('Y-m-d', strtotime('+5 days'));
-        $sqldetail = "UPDATE tbl_transaction_header SET status=2, start_date='$startDate',expected_return_date='$return' where transaction_no=$transId";
+        $sqldetail = "UPDATE tbl_transaction_header SET status=2, start_date='$startDate',expected_return_date='$return' where transaction_no=$trans";
         $conn->query($sqldetail);
-        $sqlheader = "UPDATE tbl_transaction_detail SET status=2 where transaction_no=$transId";
+        $sqlheader = "UPDATE tbl_transaction_detail SET status=2 where transaction_no=$trans";
         $conn->query($sqlheader);
-        $sqltransdet="SELECT quantity,item_code FROM tbl_transaction_detail where transaction_no=$transId";
+        $sqltransdet = "SELECT quantity,item_code FROM tbl_transaction_detail where transaction_no=$trans";
         $rstransdet = $conn->query($sqltransdet);
-        foreach($rstransdet as $rowtrans){
+        foreach ($rstransdet as $rowtrans) {
             $transqty = $rowtrans['quantity'];
             $code = $rowtrans['item_code'];
             $sqlx = "UPDATE tbl_item SET quantity=quantity-$transqty where item_code='$code'";
@@ -90,54 +94,74 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         }
     } else if ($action == 'CANCELLED') {
         //for cancelled
-        $sqlt = "UPDATE tbl_transaction_header SET status=5 where transaction_no=$transId";
-        $sql = "UPDATE tbl_transaction_detail SET status=5 where transaction_no=$transId";
+        $sqlt = "UPDATE tbl_transaction_header SET status=5 where transaction_no=$trans";
+        $sql = "UPDATE tbl_transaction_detail SET status=5 where transaction_no=$trans";
         $conn->query($sql);
         $conn->query($sqlt);
     } else if ($action == 'RETURN') {
         //for return
-        $mysql = "SELECT
-                quantity,
-                return_quantity
-                FROM
-                    tbl_transaction_detail
-                WHERE transaction_no = $transId";
-        $rs = $conn->query($mysql);
-        if ($rs->num_rows > 0) {
-            $row = $rs->fetch_assoc();
-            $updateqty = "UPDATE tbl_transaction_detail SET return_quantity=return_quantity+$qty where transaction_no=$transId";
-            $conn->query($updateqty);
-            $qtys = "UPDATE tbl_item SET quantity=quantity+$qty where item_code='$itemCode'";
-            $conn->query($qtys);
-            checkReturns($transId, $conn);
-        }
+        $updateqty = "UPDATE tbl_transaction_detail SET return_quantity=return_quantity+$qty where trans_item_id=$transId";
+        $qtys = "UPDATE tbl_item SET quantity=quantity+$qty where item_code='$itemCode'";
+        $conn->query($updateqty);
+        $conn->query($qtys);
+        checkReturns($transId, $conn);
+        checkTransactReturn($trans, $conn);
     }
 }
 
 function checkReturns($transId, $conn)
 {
-
     $sqlReturns = "SELECT
                     quantity,
                     return_quantity
                     FROM
                         tbl_transaction_detail
-                    WHERE transaction_no = $transId";
+                    WHERE trans_item_id = $transId";
     $rs = $conn->query($sqlReturns);
     $row = $rs->fetch_assoc();
     if ($rs->num_rows > 0) {
         if ($row['return_quantity'] == $row['quantity']) {
-            $updateqty = "UPDATE tbl_transaction_detail SET status=0 where transaction_no=$transId";
-            $updatehead= "UPDATE tbl_transaction_header SET status=0 where transaction_no=$transId";
+            $updateqty = "UPDATE tbl_transaction_detail SET status=0 where trans_item_id=$transId";
             $conn->query($updateqty);
-            $conn->query($updatehead);
         } else {
-            $updateqty = "UPDATE tbl_transaction_detail SET status=1 where transaction_no=$transId";
-            $updatehead= "UPDATE tbl_transaction_header SET status=1 where transaction_no=$transId";
+            $updateqty = "UPDATE tbl_transaction_detail SET status=1 where trans_item_id=$transId";
             $conn->query($updateqty);
-            $conn->query($updatehead);
         }
-       
+    }
+}
+
+function checkTransactReturn($transNo, $conn)
+{
+    $sqlReturns = "SELECT
+    SUM(quantity) AS currentQty,
+    SUM(return_quantity) AS returnQuantity,
+    head.expected_return_date,
+    head.borrower_id
+FROM
+    tbl_transaction_detail det
+INNER JOIN tbl_transaction_header head ON det.transaction_no=head.transaction_no
+WHERE
+    det.transaction_no = $transNo
+GROUP BY
+    det.transaction_no";
+    $rs = $conn->query($sqlReturns);
+    $row = $rs->fetch_assoc();
+    if ($rs->num_rows > 0) {
+        if ($row['currentQty'] == $row['returnQuantity']) {
+            $date = date('Y-m-d');
+            $updateqty = "UPDATE tbl_transaction_header SET status=0,return_date='$date' where transaction_no=$transNo";
+            $conn->query($updateqty);
+            if (strtotime($row['expected_return_date']) < strtotime($date)) {
+                $sqlpen = "INSERT INTO tbl_penalty(transaction_no) values ($transNo)";
+                $conn->query($sqlpen);
+                echo "ok";
+            }
+        } else {
+            if ($row['returnQuantity'] != 0) {
+                $updateqty = "UPDATE tbl_transaction_header SET status=1 where transaction_no=$transNo";
+                $conn->query($updateqty);
+            }
+        }
     }
 }
 
@@ -159,5 +183,3 @@ function checkReturns($transId, $conn)
     // 2-Waiting to returned  
     // 1-Partially Returned  
     // 0-Returned
-
-

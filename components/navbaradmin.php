@@ -25,7 +25,7 @@
               </div>
             </a>
             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <a href="../logout.php?borrowid=<?php echo $_SESSION['borrower_id'] ?>&type=<?php echo 2 ?>" class="dropdown-item">Logout</a>
+              <a href="../logout.php?admin_id=<?php echo $_SESSION['admin_id'] ?>&type=<?php echo 1 ?>" class="dropdown-item">Logout</a>
             </div>
           </div>
         </div>

@@ -177,7 +177,7 @@ include 'connection.php';
             formData.append('action', 'SIGNUP');
             swal({
                     title: "Are you sure?",
-                    text: "You want to delete this data?",
+                    text: "You wan't to proceed?",
                     icon: "warning",
                     buttons: true,
                     dangerMode: true,
@@ -195,6 +195,7 @@ include 'connection.php';
                                     icon: "success",
                                 }).then((value) => {
                                     // location.reload();
+                                    window.location.href="redirecting.php";
                                 });
                             }
                         });

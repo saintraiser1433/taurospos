@@ -1,7 +1,7 @@
-<?php 
+<?php
 include '../connection.php';
 
-if(!isset($_SESSION['admin_id'])){
+if (!isset($_SESSION['admin_id'])) {
   header("Location:../index.php");
 }
 
@@ -16,7 +16,7 @@ if(!isset($_SESSION['admin_id'])){
 
   <div class="page">
     <!-- Navbar -->
-    <?php include '../components/navbar.php' ?>
+    <?php include '../components/navbaradmin.php' ?>
     <?php include '../components/sidebar.php' ?>
     <div class="page-wrapper">
       <!-- Page header -->
@@ -181,7 +181,7 @@ if(!isset($_SESSION['admin_id'])){
           </div>
         </div>
       </div>
-      
+
       <?php include '../components/footer.php' ?>
     </div>
   </div>
@@ -193,7 +193,35 @@ if(!isset($_SESSION['admin_id'])){
 </html>
 
 <script>
+  $(window).bind('unload', function() {
+    $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 1,
+        admin_id: <?php echo $_SESSION['admin_id'] ?>
+      },
+      success: function(html) {
+
+      }
+    });
+  });
   $(document).ready(function() {
+    function sendSMS(id, action) {
+      $.ajax({
+        url: "../ajax/sendsms.php",
+        method: "POST",
+        data: {
+          examne: id,
+          action: action
+        },
+        dataType: "text",
+        success: function(html) {
+          location.reload();
+
+        }
+      });
+    }
     $(document).on('click', '.edit', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
@@ -218,7 +246,7 @@ if(!isset($_SESSION['admin_id'])){
                 swal("Success", {
                   icon: "success",
                 }).then((value) => {
-                  location.reload();
+                  sendSMS(col1, 'APPROVE');
                 });
               }
             });
@@ -231,8 +259,8 @@ if(!isset($_SESSION['admin_id'])){
       var currentRow = $(this).closest("tr");
       var col1 = currentRow.find("td:eq(0)").text();
       $('#modal-documents').modal('show');
-      $('#FrontID').attr('src',`../static/front/${col1}.png`)
-      $('#BackID').attr('src',`../static/back/${col1}.png`)
+      $('#FrontID').attr('src', `../static/front/${col1}.png`)
+      $('#BackID').attr('src', `../static/back/${col1}.png`)
 
       // var currentRow = $(this).closest("tr");
       // var col1 = currentRow.find("td:eq(0)").text();
@@ -277,20 +305,10 @@ if(!isset($_SESSION['admin_id'])){
         })
         .then((isConfirm) => {
           if (isConfirm) {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/approval.php",
-              data: {
-                id: col1,
-                action: 'DELETE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
+            swal("Successfull rejected", {
+              icon: "success",
+            }).then((value) => {
+              sendSMS(col1, 'REJECT');
             });
           }
         });

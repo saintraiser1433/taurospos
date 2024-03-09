@@ -29,7 +29,7 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
 
   <div class="page">
     <!-- Navbar -->
-    <?php include '../components/navbar.php' ?>
+    <?php include '../components/navbaradmin.php' ?>
     <?php include '../components/sidebar.php' ?>
     <div class="page-wrapper">
       <!-- Page header -->
@@ -198,6 +198,19 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
 
 </html>
 <script>
+    $(window).bind('unload', function() {
+     $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 1,
+        admin_id: <?php echo $_SESSION['admin_id'] ?>
+      },
+      success: function(html) {
+
+      }
+    });
+  });
   $(document).ready(function() {
     $(document).on('click', '.delete', function(e) {
       e.preventDefault();

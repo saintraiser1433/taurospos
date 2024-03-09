@@ -1,10 +1,26 @@
-<?php 
-  include '../connection.php';
-  if(!isset($_SESSION['admin_id'])){
+<?php
+include '../connection.php';
+if (!isset($_SESSION['admin_id'])) {
     header("Location:../index.php");
-  }
+}
+
+$date = date('Y');
+$sql = "SELECT COUNT(*) AS cnt,MONTHNAME(date_created) as borrow from tbl_transaction_header where YEAR(date_created)='$date'";
+$rs = $conn->query($sql);
+$resultArray = array();
+
+foreach ($rs as $row) {
+    $resultArray[] = $row;
+}
+
+
+// Extracting the required data from the array
+$cntData = array_column($resultArray, 'cnt');
+$monthData = array_column($resultArray, 'borrow');
+
 
 ?>
+
 <!doctype html>
 
 <html lang="en">
@@ -12,509 +28,277 @@
 
 <body class=" layout-fluid">
 
-  <div class="page">
-    <!-- Navbar -->
-    <?php include '../components/navbar.php' ?>
-    <?php include '../components/sidebar.php' ?>
-    <div class="page-wrapper">
-      <!-- Page header -->
-      <div class="page-header d-print-none">
-        <div class="container-xl">
-          <div class="row g-2 align-items-center">
-            <div class="col">
-              <!-- Page pre-title -->
-              <div class="page-pretitle">
-                Overview
-              </div>
-              <h2 class="page-title">
-                Fluid layout
-              </h2>
-            </div>
-            <!-- Page title actions -->
-            <div class="col-auto ms-auto d-print-none">
-              <div class="btn-list">
-                <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-report">
-                  <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 5l0 14" />
-                    <path d="M5 12l14 0" />
-                  </svg>
-                  Create new report
-                </a>
-                <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
-                  <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 5l0 14" />
-                    <path d="M5 12l14 0" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Page body -->
-      <div class="page-body">
-        <div class="container-xl">
-          <div class="row row-deck row-cards">
-            <div class="col-12">
-              <div class="row row-cards">
-                <div class="col-sm-6 col-lg-3">
-                  <div class="card card-sm">
-                    <div class="card-body">
-                      <div class="row align-items-center">
-                        <div class="col-auto">
-                          <span class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                              <path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2" />
-                              <path d="M12 3v3m0 12v3" />
-                            </svg>
-                          </span>
-                        </div>
+    <div class="page">
+        <!-- Navbar -->
+        <?php include '../components/navbaradmin.php' ?>
+        <?php include '../components/sidebar.php' ?>
+        <div class="page-wrapper">
+            <!-- Page header -->
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
                         <div class="col">
-                          <div class="font-weight-medium">
-                            132 Sales
-                          </div>
-                          <div class="text-secondary">
-                            12 waiting payments
-                          </div>
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">
+                                Overview
+                            </div>
+                            <h2 class="page-title">
+                                My Dashboard
+                            </h2>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                  <div class="card card-sm">
-                    <div class="card-body">
-                      <div class="row align-items-center">
-                        <div class="col-auto">
-                          <span class="bg-green text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/shopping-cart -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                              <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                              <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                              <path d="M17 17h-11v-14h-2" />
-                              <path d="M6 5l14 1l-1 7h-13" />
-                            </svg>
-                          </span>
-                        </div>
-                        <div class="col">
-                          <div class="font-weight-medium">
-                            78 Orders
-                          </div>
-                          <div class="text-secondary">
-                            32 shipped
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                  <div class="card card-sm">
-                    <div class="card-body">
-                      <div class="row align-items-center">
-                        <div class="col-auto">
-                          <span class="bg-twitter text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                              <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c0 -.249 1.51 -2.772 1.818 -4.013z" />
-                            </svg>
-                          </span>
-                        </div>
-                        <div class="col">
-                          <div class="font-weight-medium">
-                            623 Shares
-                          </div>
-                          <div class="text-secondary">
-                            16 today
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                  <div class="card card-sm">
-                    <div class="card-body">
-                      <div class="row align-items-center">
-                        <div class="col-auto">
-                          <span class="bg-facebook text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                              <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
-                            </svg>
-                          </span>
-                        </div>
-                        <div class="col">
-                          <div class="font-weight-medium">
-                            132 Likes
-                          </div>
-                          <div class="text-secondary">
-                            21 today
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-12">
-              <div class="card">
-                <div class="card-body">
-                  <h3 class="card-title">Traffic summary</h3>
-                  <div id="chart-mentions" class="chart-lg"></div>
-                </div>
-              </div>
-            </div>
+                        <!-- Page title actions -->
 
-
-            <div class="col-12">
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Invoices</h3>
-                </div>
-                <div class="card-body border-bottom py-3">
-                  <div class="d-flex">
-                    <div class="text-secondary">
-                      Show
-                      <div class="mx-2 d-inline-block">
-                        <input type="text" class="form-control form-control-sm" value="8" size="3" aria-label="Invoices count">
-                      </div>
-                      entries
                     </div>
-                    <div class="ms-auto text-secondary">
-                      Search:
-                      <div class="ms-2 d-inline-block">
-                        <input type="text" class="form-control form-control-sm" aria-label="Search invoice">
-                      </div>
-                    </div>
-                  </div>
                 </div>
-                <div class="table-responsive">
-                  <table class="table card-table table-vcenter text-nowrap datatable">
-                    <thead>
-                      <tr>
-                        <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>
-                        <th class="w-1">No. <!-- Download SVG icon from http://tabler-icons.io/i/chevron-up -->
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M6 15l6 -6l6 6" />
-                          </svg>
-                        </th>
-                        <th>Invoice Subject</th>
-                        <th>Client</th>
-                        <th>VAT No.</th>
-                        <th>Created</th>
-                        <th>Status</th>
-                        <th>Price</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001401</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">Design Works</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-us me-2"></span>
-                          Carlson Limited
-                        </td>
-                        <td>
-                          87956621
-                        </td>
-                        <td>
-                          15 Dec 2017
-                        </td>
-                        <td>
-                          <span class="badge bg-success me-1"></span> Paid
-                        </td>
-                        <td>$887</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001402</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">UX Wireframes</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-gb me-2"></span>
-                          Adobe
-                        </td>
-                        <td>
-                          87956421
-                        </td>
-                        <td>
-                          12 Apr 2017
-                        </td>
-                        <td>
-                          <span class="badge bg-warning me-1"></span> Pending
-                        </td>
-                        <td>$1200</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001403</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">New Dashboard</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-de me-2"></span>
-                          Bluewolf
-                        </td>
-                        <td>
-                          87952621
-                        </td>
-                        <td>
-                          23 Oct 2017
-                        </td>
-                        <td>
-                          <span class="badge bg-warning me-1"></span> Pending
-                        </td>
-                        <td>$534</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001404</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">Landing Page</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-br me-2"></span>
-                          Salesforce
-                        </td>
-                        <td>
-                          87953421
-                        </td>
-                        <td>
-                          2 Sep 2017
-                        </td>
-                        <td>
-                          <span class="badge bg-secondary me-1"></span> Due in 2 Weeks
-                        </td>
-                        <td>$1500</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001405</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">Marketing Templates</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-pl me-2"></span>
-                          Printic
-                        </td>
-                        <td>
-                          87956621
-                        </td>
-                        <td>
-                          29 Jan 2018
-                        </td>
-                        <td>
-                          <span class="badge bg-danger me-1"></span> Paid Today
-                        </td>
-                        <td>$648</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001406</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">Sales Presentation</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-br me-2"></span>
-                          Tabdaq
-                        </td>
-                        <td>
-                          87956621
-                        </td>
-                        <td>
-                          4 Feb 2018
-                        </td>
-                        <td>
-                          <span class="badge bg-secondary me-1"></span> Due in 3 Weeks
-                        </td>
-                        <td>$300</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001407</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">Logo & Print</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-us me-2"></span>
-                          Apple
-                        </td>
-                        <td>
-                          87956621
-                        </td>
-                        <td>
-                          22 Mar 2018
-                        </td>
-                        <td>
-                          <span class="badge bg-success me-1"></span> Paid Today
-                        </td>
-                        <td>$2500</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                        <td><span class="text-secondary">001408</span></td>
-                        <td><a href="invoice.html" class="text-reset" tabindex="-1">Icons</a></td>
-                        <td>
-                          <span class="flag flag-xs flag-country-pl me-2"></span>
-                          Tookapic
-                        </td>
-                        <td>
-                          87956621
-                        </td>
-                        <td>
-                          13 May 2018
-                        </td>
-                        <td>
-                          <span class="badge bg-success me-1"></span> Paid Today
-                        </td>
-                        <td>$940</td>
-                        <td class="text-end">
-                          <span class="dropdown">
-                            <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                              <a class="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a class="dropdown-item" href="#">
-                                Another action
-                              </a>
-                            </div>
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="card-footer d-flex align-items-center">
-                  <p class="m-0 text-secondary">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
-                  <ul class="pagination m-0 ms-auto">
-                    <li class="page-item disabled">
-                      <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                        <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                          <path d="M15 6l-6 6l6 6" />
-                        </svg>
-                        prev
-                      </a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                    <li class="page-item"><a class="page-link" href="#">5</a></li>
-                    <li class="page-item">
-                      <a class="page-link" href="#">
-                        next <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                          <path d="M9 6l6 6l-6 6" />
-                        </svg>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
             </div>
-          </div>
+            <!-- Page body -->
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row row-deck row-cards">
+                        <div class="col-12">
+                            <div class="row row-cards">
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="card card-sm">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto">
+                                                    <span class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-man" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M10 16v5" />
+                                                            <path d="M14 16v5" />
+                                                            <path d="M9 9h6l-1 7h-4z" />
+                                                            <path d="M5 11c1.333 -1.333 2.667 -2 4 -2" />
+                                                            <path d="M19 11c-1.333 -1.333 -2.667 -2 -4 -2" />
+                                                            <path d="M12 4m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="font-weight-medium">
+                                                        <?php
+                                                        $sql = "SELECT COUNT(*) as cnt FROM tbl_borrower where status=1";
+                                                        $rs = $conn->query($sql);
+                                                        $row = $rs->fetch_assoc();
+                                                        echo $row['cnt'] ?? 0;
+                                                        ?>
+                                                        Borrowers
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="card card-sm">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto">
+                                                    <span class="bg-green text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/shopping-cart -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="font-weight-medium">
+                                                        <?php
+                                                        $sql = "SELECT COUNT(*) as cnt FROM tbl_transaction_header where status=0";
+                                                        $rs = $conn->query($sql);
+                                                        $row = $rs->fetch_assoc();
+                                                        echo $row['cnt'] ?? 0;
+                                                        ?>
+                                                        Returned
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="card card-sm">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto">
+                                                    <span class="bg-twitter text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M4 7l16 0" />
+                                                            <path d="M10 11l0 6" />
+                                                            <path d="M14 11l0 6" />
+                                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="font-weight-medium">
+                                                        <?php
+                                                        $sql = "SELECT COUNT(*) as cnt FROM tbl_retirement";
+                                                        $rs = $conn->query($sql);
+                                                        $row = $rs->fetch_assoc();
+                                                        echo $row['cnt'] ?? 0;
+                                                        ?>
+                                                        Retired Items
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="card card-sm">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto">
+                                                    <span class="bg-facebook text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-box" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
+                                                            <path d="M12 12l8 -4.5" />
+                                                            <path d="M12 12l0 9" />
+                                                            <path d="M12 12l-8 -4.5" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="font-weight-medium">
+                                                        <?php
+                                                        $sql = "SELECT COUNT(*) as cnt FROM tbl_item where status = 1";
+                                                        $rs = $conn->query($sql);
+                                                        $row = $rs->fetch_assoc();
+                                                        echo $row['cnt'] ?? 0;
+                                                        ?>
+                                                        Total Items
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h3 class="card-title">Traffic summary</h3>
+                                    <div id="chart-mentions" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <?php include '../components/footer.php' ?>
         </div>
-      </div>
-      <?php include '../components/footer.php' ?>
     </div>
-  </div>
 
-  <?php include '../components/script.php' ?>
-
+    <?php include '../components/script.php' ?>
+    <script src="../dist/libs/apexcharts/dist/apexcharts.min.js?1684106062" defer></script>
 </body>
 
 </html>
+
+<script>
+    // @formatter:off
+    $(window).bind('unload', function() {
+     $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 1,
+        admin_id: <?php echo $_SESSION['admin_id'] ?>
+      },
+      success: function(html) {
+
+      }
+    });
+  });
+    document.addEventListener("DOMContentLoaded", function() {
+        var cntData = <?php echo json_encode($cntData); ?>;
+        var monthData = <?php echo json_encode($monthData); ?>;
+        window.ApexCharts &&
+            new ApexCharts(document.getElementById("chart-mentions"), {
+                chart: {
+                    type: "bar",
+                    fontFamily: "inherit",
+                    height: 240,
+                    parentHeightOffset: 0,
+                    toolbar: {
+                        show: false,
+                    },
+                    animations: {
+                        enabled: false,
+                    },
+                    stacked: true,
+                },
+                plotOptions: {
+                    bar: {
+                        columnWidth: "50%",
+                    },
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+                fill: {
+                    opacity: 1,
+                },
+                series: [{
+                        name: "Returned",
+                        data: cntData,
+                    },
+
+                ],
+                tooltip: {
+                    theme: "dark",
+                },
+                grid: {
+                    padding: {
+                        top: -20,
+                        right: 0,
+                        left: -4,
+                        bottom: -4,
+                    },
+                    strokeDashArray: 4,
+                    xaxis: {
+                        lines: {
+                            show: true,
+                        },
+                    },
+                },
+                xaxis: {
+                    labels: {
+                        padding: 0,
+                    },
+                    tooltip: {
+                        enabled: false,
+                    },
+                    axisBorder: {
+                        show: false,
+                    },
+                    type: "month",
+                },
+                yaxis: {
+                    labels: {
+                        padding: 4,
+                    },
+                },
+                labels: monthData,
+                colors: [
+                    tabler.getColor("green", 0.8),
+                    tabler.getColor("red"),
+
+                ],
+                legend: {
+                    show: true,
+                },
+            }).render();
+    });
+    // @formatter:on
+</script>

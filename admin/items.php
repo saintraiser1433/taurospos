@@ -15,7 +15,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 
   <div class="page">
     <!-- Navbar -->
-    <?php include '../components/navbar.php' ?>
+    <?php include '../components/navbaradmin.php' ?>
     <?php include '../components/sidebar.php' ?>
     <div class="page-wrapper">
       <!-- Page header -->
@@ -98,11 +98,6 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-status">
-                            Condition
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
                             Status
                           </button>
                         </th>
@@ -121,7 +116,6 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                       b.category_name,
                       a.quantity,
                       c.size_description,
-                      a.item_condition,
                       a.status,
                       a.img_path
                   FROM
@@ -143,19 +137,21 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                           <td class="sort-inventory text-capitalize"><?php echo $row['category_name'] ?></td>
                           <td class="sort-inventory"><?php echo $row['quantity'] ?></td>
                           <td class="sort-inventory"><?php echo $row['size_description'] ?></td>
-                          <td class="sort-inventory"><?php echo $row['item_condition'] ?></td>
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
                               echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
-                            } else if ($row['status'] == 2) {
+                            } else if ($row['status'] == 0) {
                               echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
                             }
                             ?>
 
                           </td>
                           <td>
-                            <a href="#" class="badge bg-yellow edit">
+                            <?php 
+                            if($row['status'] == 1){
+                              echo '
+                              <a href="#" class="badge bg-yellow edit">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
@@ -164,7 +160,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                               </svg>
 
                             </a> |
-                            <a href="#" class="badge bg-red delete">
+                            <a href="#" class="badge bg-red retire">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M4 7h16" />
@@ -173,6 +169,11 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                                 <path d="M10 12l4 4m0 -4l-4 4" />
                               </svg>
                             </a>
+                              ';
+                            }
+                            
+                            ?>
+                          
                           </td>
                         </tr>
                       <?php } ?>
@@ -201,6 +202,20 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 </html>
 
 <script>
+  $(window).bind('unload', function() {
+     $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 1,
+        admin_id: <?php echo $_SESSION['admin_id'] ?>
+      },
+      success: function(html) {
+
+      }
+    });
+  });
+
   function readURL(input) {
     if (input.files && input.files[0]) {
       var reader = new FileReader();
@@ -211,6 +226,22 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
       reader.readAsDataURL(input.files[0]);
     }
   }
+
+  let counter = parseInt($('#retireQty').val());
+
+  $('#addq').on('click', function() {
+    counter += 1;
+    $('#retireQty').val(counter)
+  });
+
+  $('#minusq').on('click', function() {
+    counter -= 1;
+    if (counter < 1) {
+      counter = 1;
+    }
+    $('#retireQty').val(counter);
+
+  });
   $(document).ready(function() {
     let id = null;
     $(document).on('click', '.add', function() {
@@ -221,7 +252,6 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
       $('#itemName').val('')
       $('#itemDescription').val('')
       $('#itemCategory').val('')
-      $('#itemCondition').val('')
       $('#itemQty').val('')
       $('#itemSize').val('')
     });
@@ -250,8 +280,6 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
           $('#itemName').val(html.item_name)
           $('#itemDescription').val(html.description)
           $('#itemCategory').val(html.category_id)
-          $('#itemCondition').val(html.item_condition)
-          $('#itemQty').val(html.quantity)
           $('#itemSize').val(html.size_id)
           $('#ImgID').attr('src', `../static/item/${html.img_path}`)
         }
@@ -269,8 +297,6 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
       formData.append('itemName', $('#itemName').val());
       formData.append('itemDescription', $('#itemDescription').val());
       formData.append('itemCategory', $('#itemCategory').val());
-      formData.append('itemCondition', $('#itemCondition').val());
-      formData.append('itemQty', $('#itemQty').val());
       formData.append('itemSize', $('#itemSize').val());
       formData.append('files', fileInput.files[0]);
       if (id === null) {
@@ -320,7 +346,6 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                 }
               });
             }
-
           }
         });
     });
@@ -359,36 +384,62 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
     });
 
 
-    $(document).on('click', '.delete', function(e) {
-      e.preventDefault();
+    $(document).on('click', '.retire', function(e) {
+      $('#modal-retire').modal('show');
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to delete this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
+      var col1 = currentRow.find("td:eq(1)").text();
+      var col2 = currentRow.find("td:eq(2)").text();
+      var col3 = currentRow.find("td:eq(4)").text();
+      $('#retireId').val(col1);
+      $('#itemtoRetire').val(col2);
+      $('#actualQty').val(col3);
+    });
+
+    $(document).on('click', '#submitRetire', function(e) {
+      e.preventDefault();
+      const itemCode = $('#retireId').val();
+      const actualQty = $('#actualQty').val();
+      const retireQty = $('#retireQty').val();
+      const remarks = $('#remarks').val();
+      if (actualQty < retireQty) {
+        swal("Invalid Quantity", {
+          icon: "error",
         })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/inventory.php",
-              data: {
-                id: col1,
-                action: 'DELETE'
-              },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
-              }
-            });
-          }
-        });
+      } else if (remarks == '') {
+        swal("Remarks is required", {
+          icon: "error",
+        })
+      } else {
+        swal({
+            title: "Are you sure?",
+            text: "You want to retire this item?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((isConfirm) => {
+            if (isConfirm) {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/inventory.php",
+                data: {
+                  itemCode: itemCode,
+                  qty: retireQty,
+                  remarks: remarks,
+                  action: 'RETIRE'
+                },
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            }
+          });
+      }
+
     });
   });
 </script>

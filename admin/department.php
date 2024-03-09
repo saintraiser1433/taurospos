@@ -15,7 +15,7 @@ if(!isset($_SESSION['admin_id'])){
 
   <div class="page">
     <!-- Navbar -->
-    <?php include '../components/navbar.php' ?>
+    <?php include '../components/navbaradmin.php' ?>
     <?php include '../components/sidebar.php' ?>
     <div class="page-wrapper">
       <!-- Page header -->

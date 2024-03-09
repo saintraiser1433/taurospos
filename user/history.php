@@ -11,9 +11,8 @@ if (!isset($_SESSION['borrower_id'])) {
 
 <html lang="en">
 <?php include '../components/head.php' ?>
-<?php include '../components/script.php' ?>
 
-<body class=" layout-fluid">
+<body class="layout-fluid">
 
   <div class="page">
     <!-- Navbar -->
@@ -30,7 +29,7 @@ if (!isset($_SESSION['borrower_id'])) {
                 Overview
               </div>
               <h2 class="page-title">
-                Transaction
+                My History Transaction
               </h2>
             </div>
 
@@ -113,10 +112,11 @@ if (!isset($_SESSION['borrower_id'])) {
                       tbl_transaction_header a
                   INNER JOIN tbl_borrower b ON
                       a.borrower_id = b.borrower_id
-                  WHERE a.status IN(0,5,4) and a.borrower_id='$borrow'
+                  WHERE a.status IN (0,5,4) and a.borrower_id='$borrow'
                   ORDER BY
+                      a.status,
                       a.date_created
-                  DESC";
+                  ASC";
                       $rs = $conn->query($sql);
                       foreach ($rs as $row) { ?>
                         <tr>
@@ -127,7 +127,7 @@ if (!isset($_SESSION['borrower_id'])) {
                             if ($row['start_date'] == '0000-00-00') {
                               echo '-';
                             } else {
-                              echo $row['start_date'];
+                              echo date('M-d-Y', strtotime($row['start_date']));
                             }
 
                             ?>
@@ -137,7 +137,7 @@ if (!isset($_SESSION['borrower_id'])) {
                             if ($row['expected_return_date'] == '0000-00-00') {
                               echo '-';
                             } else {
-                              echo $row['expected_return_date'];
+                              echo date('M-d-Y', strtotime($row['expected_return_date']));
                             }
 
                             ?>
@@ -147,31 +147,20 @@ if (!isset($_SESSION['borrower_id'])) {
                             if ($row['return_date'] == '0000-00-00') {
                               echo '-';
                             } else {
-                              echo $row['return_date'];
+                              echo date('M-d-Y', strtotime($row['return_date']));
                             }
 
                             ?>
                           </td>
                           <td class="sort-status">
-
                             <?php
-                            if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
-                            } else if ($row['status'] == 2) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
-                            } else if ($row['status'] == 3) {
-                              echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
+                            if ($row['status'] == 0) {
+                              echo '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">RETURNED</span>';
                             } else if ($row['status'] == 4) {
-                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">Rejected</span>';
+                              echo '<span class="badge badge-sm bg-pink text-uppercase ms-auto text-white">REJECTED</span>';
                             } else if ($row['status'] == 5) {
-                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Cancelled</span>';
-                            } else if ($row['status'] == 6) {
-                              echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
-                            } else  if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Returned</span>';
+                              echo '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">CANCELLED</span>';
                             }
-
-
                             ?>
                           </td>
                           <td>
@@ -182,13 +171,6 @@ if (!isset($_SESSION['borrower_id'])) {
                                 <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
                               </svg>
                             </a>
-                            <?php
-                            if ($row['status'] == 3 ||  $row['status'] == 6) {
-                              echo ' <a href="#" class="badge bg-danger cancel text-decoration-none" title="Reject">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>
-                              </a>';
-                            }
-                            ?>
                           </td>
                         </tr>
                       <?php } ?>
@@ -217,14 +199,114 @@ if (!isset($_SESSION['borrower_id'])) {
 
 </html>
 <script>
+  $(window).bind('unload', function() {
+    $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 2,
+        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
+      },
+      success: function(html) {
+
+      }
+    });
+  });
   $(document).ready(function() {
-    $(document).on('click', '.cancel', function(e) {
+
+    function getDetails(data) {
+      $.ajax({
+        method: "POST",
+        url: "../ajax/transborrow.php",
+        data: {
+          trans_code: data,
+          action: 'GET'
+        },
+        success: function(response) {
+          // Clear existing data first
+          $('.thedata').empty();
+          // Iterate over each object in the response array
+          for (var i = 0; i < response.length; i++) {
+            var item = response[i];
+            // Define a variable to hold the status badge HTML
+            var statusBadge;
+            if (item.status == 4) {
+              statusBadge = '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
+            } else if (item.status == 3) {
+              statusBadge = '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to claim</span>';
+            } else if (item.status == 2) {
+              statusBadge = '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
+            } else if (item.status == 1) {
+              statusBadge = '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
+            } else if (item.status == 0) {
+              statusBadge = '';
+            } else {
+              statusBadge = '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">Invalid</span>';
+            }
+
+            $('.thedata').append(
+              `<tr>
+                <td>${item.item_name}</td>
+                <td>${item.qty}</td>
+                <td>${item.return_quantity}</td>
+                <td><span class="badge badge-sm bg-success text-uppercase ms-auto text-white">Returned</span></td>
+                </tr>`
+            );
+
+          }
+
+        },
+        error: function(xhr, status, error) {
+          console.error(error); // Log any errors for debugging
+        }
+      });
+    }
+
+
+
+
+
+    $(document).on('click', '.details', function() {
+      $tr = $(this).closest('tr');
+      var data = $tr.children("td").map(function() {
+        return $(this).text();
+      }).get();
+      $('#modal-details').modal('show');
+      getDetails(data[0]);
+      transNo = data[0];
+    });
+
+
+    $(document).on('click', '#add', function() {
+      var counterElement = $(this).siblings('input');
+      var currentValue = parseInt(counterElement.val());
+      var currentQuantity = parseInt(counterElement.data('current-quantity'));
+      var returnQuantity = parseInt(counterElement.data('return-quantity'));
+      var total = currentQuantity - returnQuantity;
+      if (currentValue < total) {
+        counterElement.val(currentValue + 1);
+      }
+    });
+
+    $(document).on('click', '#minus', function() {
+      var counterElement = $(this).siblings('input');
+      var currentValue = parseInt(counterElement.val());
+      if (currentValue > 1) {
+        counterElement.val(currentValue - 1);
+      }
+    });
+
+
+    $(document).on('click', '.ok', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(0)").text();
+      var transId = currentRow.find("td:eq(5)").text();
+      var itemCode = currentRow.find("td:eq(6)").text();
+      var transCode = currentRow.find("td:eq(7)").text();
+      var counterElement = currentRow.find('input[type="text"]');
+      var currentValue = parseInt(counterElement.val());
       swal({
           title: "Are you sure?",
-          text: "You want to cancelled this transaction?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -235,8 +317,44 @@ if (!isset($_SESSION['borrower_id'])) {
               method: "POST",
               url: "../ajax/transborrow.php",
               data: {
-                transid: col1,
-                action: 'CANCELLED'
+                transid: transId,
+                qty: currentValue,
+                item_code: itemCode,
+                trans_code: transCode,
+                action: 'RETURN'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  getDetails(transCode)
+                });
+              }
+            });
+          }
+        });
+    });
+
+
+    $(document).on('click', '.approved', function(e) {
+      e.preventDefault();
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(0)").text();
+      swal({
+          title: "Are you sure?",
+          text: "You want to approved this transaction?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                trans_code: col1,
+                action: 'APPROVED'
               },
               success: function(html) {
                 swal("Success", {
@@ -249,54 +367,76 @@ if (!isset($_SESSION['borrower_id'])) {
           }
         });
     });
-    $(document).on('click', '.details', function() {
+
+    // REJECT
+    $(document).on('click', '.reject', function(e) {
+      e.preventDefault();
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(0)").text();
+      swal({
+          title: "Are you sure?",
+          text: "You want to reject this transaction?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                trans_code: col1,
+                action: 'REJECT'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
+          }
+        });
+    });
+
+
+    $(document).on('click', '.receive', function(e) {
+      e.preventDefault();
       $tr = $(this).closest('tr');
       var data = $tr.children("td").map(function() {
         return $(this).text();
       }).get();
-
-      $.ajax({
-        method: "POST",
-        url: "../ajax/transborrow.php",
-        data: {
-          trans_code: data[0],
-          action: 'GET'
-        },
-        success: function(response) {
-          $('#modal-details').modal('show');
-          // Clear existing data first
-          $('.thedata').empty();
-          // Iterate over each object in the response array
-          for (var i = 0; i < response.length; i++) {
-            var item = response[i];
-            // Define a variable to hold the status badge HTML
-            var statusBadge;
-            if (item.status == 0) {
-              statusBadge = '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">Waiting to Returned</span>';
-            } else if (item.status == 1) {
-              statusBadge = '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
-            } else if (item.status == 2) {
-              statusBadge = '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">Returned</span>';
-            }else{
-              statusBadge = '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">Invalid</span>';
-            }
-
-            // Append a new row with data from the current object
-            $('.thedata').append(
-              `<tr>
-            <td>${item.item_name}</td>
-            <td>${item.qty}</td>
-            <td>${item.return_quantity}</td>
-            <td>${statusBadge}</td>
-        </tr>`
-            );
+      swal({
+          title: "Are you sure?",
+          text: "This can't be undo this action?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/transborrow.php",
+              data: {
+                trans_code: data[0],
+                qty: data[3],
+                code: data[10],
+                action: 'RECEIVE'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
           }
-
-        },
-        error: function(xhr, status, error) {
-          console.error(error); // Log any errors for debugging
-        }
-      });
+        });
     });
+
   });
 </script>

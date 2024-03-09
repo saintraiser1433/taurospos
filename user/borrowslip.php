@@ -15,7 +15,7 @@ if (!isset($_GET['code'])) {
 <!doctype html>
 <html lang="en">
 <?php include '../components/head.php' ?>
-<?php include '../components/script.php' ?>
+
 <body class="layout-fluid">
 
   <div class="page">
@@ -59,7 +59,7 @@ if (!isset($_GET['code'])) {
                     </p>
                   </div>
                   <div class="card-actions">
-                    <a href="items.php" class="btn btn-secondary d-none d-sm-inline-block">
+                    <a href="index.php" class="btn btn-secondary d-none d-sm-inline-block">
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-bar-to-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M10 12l10 0" />
@@ -108,7 +108,6 @@ if (!isset($_GET['code'])) {
                             <input type="text" class="form-control text-center" id="counter" value="1" autocomplete="off" readonly>
                             <button class="input-group-text" id="add">+</button>
                           </div>
-
                         </div>
                         <button class="btn btn-primary mt-2" id="proceed">Add to Cart</button>
                       </div>
@@ -125,13 +124,26 @@ if (!isset($_GET['code'])) {
   </div>
   </div>
 
-
+  <?php include '../components/script.php' ?>
 
 </body>
 
 </html>
 
 <script>
+   $(window).bind('unload', function() {
+    $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 2,
+        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
+      },
+      success: function(html) {
+
+      }
+    });
+  });
   let counter = parseInt($('#counter').val());
 
   $('#add').on('click', function() {

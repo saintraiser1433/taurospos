@@ -1,8 +1,8 @@
-<?php
-include '../connection.php';
+<?php include '../connection.php';
 if (!isset($_SESSION['admin_id'])) {
   header("Location:../index.php");
 }
+
 ?>
 
 <!doctype html>
@@ -27,7 +27,7 @@ if (!isset($_SESSION['admin_id'])) {
                 Overview
               </div>
               <h2 class="page-title">
-                Category Panel
+                Stock In Panel
               </h2>
             </div>
             <!-- Page title actions -->
@@ -40,7 +40,7 @@ if (!isset($_SESSION['admin_id'])) {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new sizes
+                  Add New Stock
                 </a>
               </div>
             </div>
@@ -72,47 +72,62 @@ if (!isset($_SESSION['admin_id'])) {
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-category">
-                            Description
+                            Item Code
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort">
-                            Action
+                          <button class="table-sort" data-sort="sort-category">
+                            Item Name
                           </button>
                         </th>
-                        <th class="d-none"></th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
+                            Actual Quantity
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
+                            Added Quantity
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
+                            New Quantity
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
+                            Date Added
+                          </button>
+                        </th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_size order by size_id asc";
+                      $sql = "SELECT
+                              a.old_quantity,
+                              a.added_quantity,
+                              a.item_code,
+                              b.item_name,
+                              a.date_added
+                          FROM
+                              tbl_stock_in a
+                          LEFT JOIN tbl_item b ON
+                              a.item_code = b.item_code
+                          ORDER BY
+                              a.date_added
+                          DESC";
                       $rs = $conn->query($sql);
                       $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <th class="sort-id"><?php echo $i++ ?></th>
-                          <td class="sort-category text-capitalize"><?php echo $row['size_description'] ?></td>
-                          <td>
-                            <a href="#" class="badge bg-yellow edit">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
-                                <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
-                              </svg>
-
-                            </a> |
-                            <a href="#" class="badge bg-red delete">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 7h16" />
-                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                <path d="M10 12l4 4m0 -4l-4 4" />
-                              </svg>
-                            </a>
-                          </td>
-                          <td class="d-none"><?php echo $row['size_id'] ?></td>
+                          <td class="sort-id"><?php echo $i++ ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['item_code'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['item_name'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['old_quantity'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['added_quantity'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['added_quantity'] + $row['old_quantity'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo date('M-d-Y', strtotime($row['date_added'])); ?></td>
                         </tr>
 
                       <?php } ?>
@@ -156,89 +171,60 @@ if (!isset($_SESSION['admin_id'])) {
       }
     });
   });
+  let counter = parseInt($('#counter').val());
+  let curStock = 0;
+
+  $('#stockshow').hide();
+
+  $('#add').on('click', function() {
+    counter += 1;
+    $('#counter').val(counter)
+    $('#newstock').html(counter + curStock);
+    if (counter == 0) {
+      $('#saveStock').attr('disabled', true);
+    } else {
+      $('#saveStock').attr('disabled', false);
+    }
+  });
+
+  $('#minus').on('click', function() {
+    counter -= 1;
+
+    if (counter < 0) {
+      counter = 0;
+    }
+    if (counter == 0) {
+      $('#saveStock').attr('disabled', true);
+    } else {
+      $('#saveStock').attr('disabled', false);
+    }
+    $('#counter').val(counter)
+    $('#newstock').html(counter + curStock);
+
+
+  });
   $(document).ready(function() {
-    let id = 0;
     $(document).on('click', '.add', function() {
-      $('#modal-size').modal('show');
-      $('#sizeDescription').val('');
-      id = 0;
-      $('.md-size-title').html('Insert Category');
+      $('#modal-stockin').modal('show');
     });
 
-    $(document).on('click', '.edit', function() {
-      let stat = '';
-      $tr = $(this).closest('tr');
-      var data = $tr.children("td").map(function() {
-        return $(this).text();
-      }).get();
-      id = data[2];
-      $('#modal-size').modal('show');
-      $('#sizeDescription').val(data[0])
-      $('.md-size-title').html('Update Size Description');
+    $(document).on('change', '#selectItemName', function() {
+      var value2 = $(this).find(':selected').data('qty');
+      curStock = value2;
+      $('#curstock').html(curStock);
+      $('#newstock').html(curStock);
+      $('#stockshow').show();
     });
 
 
 
-    $(document).on('click', '#submit', function(e) {
+
+    $(document).on('click', '#saveStock', function(e) {
       e.preventDefault();
-      var description = $('#sizeDescription').val();
+      var itemCode = $('#selectItemName').val();
       swal({
           title: "Are you sure?",
-          text: "You want to add this size?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            if (id === 0) {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/size.php",
-                data: {
-                  description: description,
-                  action: 'ADD'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            } else {
-              $.ajax({
-                method: "POST",
-                url: "../ajax/size.php",
-                data: {
-                  id: id,
-                  description: description,
-                  action: 'UPDATE'
-                },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-                }
-              });
-            }
-
-          }
-        });
-    });
-
-
-
-    $(document).on('click', '.delete', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(2)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to delete this data?",
+          text: "You want to add quantity of this item?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -247,10 +233,12 @@ if (!isset($_SESSION['admin_id'])) {
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/size.php",
+              url: "../ajax/inventory.php",
               data: {
-                id: col1,
-                action: 'DELETE'
+                itemCode: itemCode,
+                qty: curStock,
+                addedqty: counter,
+                action: 'STOCKIN'
               },
               success: function(html) {
                 swal("Success", {
@@ -260,8 +248,10 @@ if (!isset($_SESSION['admin_id'])) {
                 });
               }
             });
+
           }
         });
     });
+
   });
 </script>

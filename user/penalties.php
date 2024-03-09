@@ -1,10 +1,8 @@
-<?php
-include '../connection.php';
-$trn = substr(str_shuffle("01234567894578942"), 0, 8);
+<?php include '../connection.php';
 if (!isset($_SESSION['borrower_id'])) {
   header("Location:../index.php");
 }
-$id = $_SESSION['borrower_id'];
+
 ?>
 
 <!doctype html>
@@ -17,7 +15,7 @@ $id = $_SESSION['borrower_id'];
   <div class="page">
     <!-- Navbar -->
     <?php include '../components/navbar.php' ?>
-    <?php include '../components/usersidebar.php' ?>
+    <?php include '../components/sidebar.php' ?>
     <div class="page-wrapper">
       <!-- Page header -->
       <div class="page-header d-print-none">
@@ -29,10 +27,11 @@ $id = $_SESSION['borrower_id'];
                 Overview
               </div>
               <h2 class="page-title">
-                My Cart
+                Penalties
               </h2>
             </div>
-
+            <!-- Page title actions -->
+           
           </div>
         </div>
       </div>
@@ -43,25 +42,7 @@ $id = $_SESSION['borrower_id'];
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
-                  <div class="btn-list">
-                    <?php
-                    $sqlt = "SELECT * FROM tbl_cart where borrower_id='$id'";
-                    $rst = $conn->query($sqlt);
-                    if ($rst->num_rows > 0) {
-                      echo '<button type="button" class="btn btn-primary d-none d-sm-inline-block proceed">
-                      <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
-                      </svg>
-                      Process Borrow
-                    </button>';
-                    }
-
-                    ?>
-
-
-                  </div>
+                  <div></div>
                   <div class="flex-shrink-0">
                     <input class="form-control listjs-search" id="search-input" placeholder="Search" style="max-width: 200px;" />
                   </div>
@@ -74,46 +55,81 @@ $id = $_SESSION['borrower_id'];
                       <tr>
                         <th>
                           <button class="table-sort" data-sort="sort-id">
-                            Item Code
+                            #
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-department">
-                            Item Name
+                          <button class="table-sort" data-sort="sort-category">
+                            Transaction No
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Quantity
+                          <button class="table-sort" data-sort="sort-category">
+                            Borrower Name
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort">
-                            Action
+                          <button class="table-sort" data-sort="sort-category">
+                            Penalty
                           </button>
                         </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
+                            Status
+                          </button>
+                        </th>
+                        <th class="d-none"></th>
+                       
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-
-                      $sql = "SELECT b.item_code,b.item_name,SUM(a.quantity) as qtysum FROM tbl_cart a INNER JOIN tbl_item b ON a.item_code = b.item_code where a.borrower_id='$id' group by a.item_code";
+                      $id = $_SESSION['borrower_id'];
+                      $sql = "SELECT
+                      a.amount,
+                      a.status,
+                      a.transaction_no,
+                      a.penalty_id,
+                      'OVERDUE' AS remarks,
+                      CONCAT(
+                          c.first_name,
+                          ', ',
+                          c.last_name,
+                          ' ',
+                          LEFT(c.middle_name, 1)
+                      ) AS borrower_name
+                  FROM
+                      tbl_penalty a
+                  INNER JOIN tbl_transaction_header b ON
+                      a.transaction_no = b.transaction_no
+                  INNER JOIN tbl_borrower c ON
+                      b.borrower_id = c.borrower_id
+                  WHERE b.borrower_id = '$id'
+                  ORDER BY
+                      a.status ASC";
                       $rs = $conn->query($sql);
+                      $i = 1;
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $row['item_code'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['item_name'] ?></td>
-                          <td class="sort-department text-capitalize"><?php echo $row['qtysum'] ?></td>
-                          <td><a href="#" class="badge bg-danger remove text-decoration-none" title="remove">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                                <path d="M10 10l4 4m0 -4l-4 4" />
-                              </svg>
-                            </a>
-                          </td>
+                          <td class="sort-id"><?php echo $i++ ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['transaction_no'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['borrower_name'] ?></td>
+                          <td class="sort-category text-capitalize"><?php echo $row['amount'] ?></td>
+                          <td class="sort-category text-capitalize"><?php 
+                             if ($row['status'] == 0) {
+                              echo '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">NOT PAID</span>';
+                            } else if ($row['status'] == 1) {
+                              echo '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">PAID</span>'; 
+                            }
+                              ?>
+                              </td>
+                         
+                          <td class="d-none"><?php echo $row['penalty_id'] ?></td>
                         </tr>
+
                       <?php } ?>
+
+
                     </tbody>
                   </table>
                   <br>
@@ -137,6 +153,7 @@ $id = $_SESSION['borrower_id'];
 </body>
 
 </html>
+
 <script>
   $(window).bind('unload', function() {
     $.ajax({
@@ -152,29 +169,14 @@ $id = $_SESSION['borrower_id'];
     });
   });
   $(document).ready(function() {
-    $(document).on('click', '.remove', function(e) {
+
+    $(document).on('click', '.paid', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(0)").text();
-      $.ajax({
-        method: "POST",
-        url: "../ajax/cart.php",
-        data: {
-          item_code: col1,
-          action: 'REMOVE'
-        },
-        success: function(html) {
-          toastr.success("Successfully remove item to cart");
-          location.reload();
-        }
-      });
-    });
-
-    $(document).on('click', '.proceed', function(e) {
-      e.preventDefault();
+      var col1 = currentRow.find("td:eq(6)").text();
       swal({
           title: "Are you sure?",
-          text: "You want to borrow this items?",
+          text: "This borrower is paid? this can't be undo",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -183,21 +185,23 @@ $id = $_SESSION['borrower_id'];
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/transborrow.php",
+              url: "../ajax/penalty.php",
               data: {
-                trans_code: '<?php echo $trn ?>',
-                action: 'ADD'
+                penaltyId: col1,
+                action:'ADD',
               },
               success: function(html) {
                 swal("Success", {
                   icon: "success",
                 }).then((value) => {
-                  window.location.href = "transaction.php";
+                  location.reload();
                 });
               }
             });
+
           }
         });
     });
+
   });
 </script>

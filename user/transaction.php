@@ -11,7 +11,6 @@ if (!isset($_SESSION['borrower_id'])) {
 
 <html lang="en">
 <?php include '../components/head.php' ?>
-<?php include '../components/script.php' ?>
 
 <body class=" layout-fluid">
 
@@ -127,7 +126,7 @@ if (!isset($_SESSION['borrower_id'])) {
                             if ($row['start_date'] == '0000-00-00') {
                               echo '-';
                             } else {
-                              echo $row['start_date'];
+                              echo date('M-d-Y', strtotime($row['start_date']));
                             }
 
                             ?>
@@ -137,7 +136,7 @@ if (!isset($_SESSION['borrower_id'])) {
                             if ($row['expected_return_date'] == '0000-00-00') {
                               echo '-';
                             } else {
-                              echo $row['expected_return_date'];
+                              echo date('M-d-Y', strtotime($row['expected_return_date']));
                             }
 
                             ?>
@@ -147,9 +146,8 @@ if (!isset($_SESSION['borrower_id'])) {
                             if ($row['return_date'] == '0000-00-00') {
                               echo '-';
                             } else {
-                              echo $row['return_date'];
+                              echo date('M-d-Y', strtotime($row['return_date']));
                             }
-
                             ?>
                           </td>
                           <td class="sort-status">
@@ -162,9 +160,7 @@ if (!isset($_SESSION['borrower_id'])) {
                               echo '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
                             } else if ($row['status'] == 6) {
                               echo '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
-                            } 
-
-
+                            }
                             ?>
                           </td>
                           <td>
@@ -210,6 +206,19 @@ if (!isset($_SESSION['borrower_id'])) {
 
 </html>
 <script>
+  $(window).bind('unload', function() {
+    $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 2,
+        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
+      },
+      success: function(html) {
+
+      }
+    });
+  });
   $(document).ready(function() {
     $(document).on('click', '.cancel', function(e) {
       e.preventDefault();
@@ -228,7 +237,7 @@ if (!isset($_SESSION['borrower_id'])) {
               method: "POST",
               url: "../ajax/transborrow.php",
               data: {
-                transid: col1,
+                trans_code: col1,
                 action: 'CANCELLED'
               },
               success: function(html) {
@@ -266,15 +275,15 @@ if (!isset($_SESSION['borrower_id'])) {
             var statusBadge;
             if (item.status == 4) {
               statusBadge = '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
-            }else if (item.status == 3) {
+            } else if (item.status == 3) {
               statusBadge = '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to claim</span>';
-            }else if (item.status == 2) {
+            } else if (item.status == 2) {
               statusBadge = '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
             } else if (item.status == 1) {
               statusBadge = '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
             } else if (item.status == 0) {
               statusBadge = '<span class="badge badge-sm bg-success text-uppercase ms-auto text-white">Returned</span>';
-            }else{
+            } else {
               statusBadge = '<span class="badge badge-sm bg-danger text-uppercase ms-auto text-white">Invalid</span>';
             }
 

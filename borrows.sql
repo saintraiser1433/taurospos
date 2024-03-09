@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 08, 2024 at 10:29 AM
+-- Generation Time: Mar 09, 2024 at 03:01 AM
 -- Server version: 8.2.0
--- PHP Version: 8.2.13
+-- PHP Version: 7.4.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `tbl_admin` (
   `admin_id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `login_session` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`admin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -39,8 +40,8 @@ CREATE TABLE IF NOT EXISTS `tbl_admin` (
 -- Dumping data for table `tbl_admin`
 --
 
-INSERT INTO `tbl_admin` (`admin_id`, `username`, `password`) VALUES
-(1, 'admin', 'admin');
+INSERT INTO `tbl_admin` (`admin_id`, `username`, `password`, `login_session`) VALUES
+(1, 'admin', 'admin', 0);
 
 -- --------------------------------------------------------
 
@@ -64,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `tbl_borrower` (
   `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `date_created` datetime NOT NULL,
+  `login_session` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`borrower_id`),
   KEY `fk_tbl_department` (`department_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -72,8 +74,9 @@ CREATE TABLE IF NOT EXISTS `tbl_borrower` (
 -- Dumping data for table `tbl_borrower`
 --
 
-INSERT INTO `tbl_borrower` (`borrower_id`, `first_name`, `middle_name`, `last_name`, `phone_number`, `department_id`, `type`, `status`, `status_approval`, `front_id_path`, `back_id_path`, `username`, `password`, `date_created`) VALUES
-('312312', 'SDFSDF', 'FSDFDS', 'SDFSD', '09312312', 2, 'Student', 1, 1, '../static/front/312312.png', '../static/back/312312.png', 'johnadmin', '1234', '0000-00-00 00:00:00');
+INSERT INTO `tbl_borrower` (`borrower_id`, `first_name`, `middle_name`, `last_name`, `phone_number`, `department_id`, `type`, `status`, `status_approval`, `front_id_path`, `back_id_path`, `username`, `password`, `date_created`, `login_session`) VALUES
+('12312', 'fdfdsf', 'dasdasd', 'Fusingan', '639770372449', 2, 'Student', 1, 1, '../static/front/12312.png', '../static/back/12312.png', 'fussy', 'fussy', '0000-00-00 00:00:00', 0),
+('312312', 'SDFSDF', 'FSDFDS', 'SDFSD', '09312312', 2, 'Student', 1, 1, '../static/front/312312.png', '../static/back/312312.png', 'johnadmin', '1234', '0000-00-00 00:00:00', 0);
 
 -- --------------------------------------------------------
 
@@ -90,7 +93,16 @@ CREATE TABLE IF NOT EXISTS `tbl_cart` (
   PRIMARY KEY (`cart_id`),
   KEY `fk_cart_item_code` (`item_code`),
   KEY `fk_cart_borrower_id` (`borrower_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_cart`
+--
+
+INSERT INTO `tbl_cart` (`cart_id`, `item_code`, `quantity`, `borrower_id`) VALUES
+(58, 'ohb5s6', 1, '12312'),
+(59, 'l4csb7', 1, '12312'),
+(60, 'l4csb7', 1, '12312');
 
 -- --------------------------------------------------------
 
@@ -147,8 +159,7 @@ CREATE TABLE IF NOT EXISTS `tbl_item` (
   `item_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `category_id` int NOT NULL,
   `size_id` int NOT NULL,
-  `quantity` int NOT NULL,
-  `item_condition` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `quantity` int NOT NULL DEFAULT '0',
   `status` int NOT NULL,
   `description` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `img_path` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -162,10 +173,11 @@ CREATE TABLE IF NOT EXISTS `tbl_item` (
 -- Dumping data for table `tbl_item`
 --
 
-INSERT INTO `tbl_item` (`item_code`, `item_name`, `category_id`, `size_id`, `quantity`, `item_condition`, `status`, `description`, `img_path`, `date_created`) VALUES
-('l4csb7', 'Beaker', 3, 2, 25, 'Good', 1, 'beaker description', 'Beaker1709819570.png', '2024-03-07 21:52:50'),
-('ls6w95', 'TEST CATEGORY', 3, 2, 121, 'Good', 1, 'CADAS', 'TEST CATEGORY1709825943.png', '2024-03-07 23:39:03'),
-('ohb5s6', '123123', 4, 2, 8, 'Good', 1, 'descriptiontgesst1', '1231231709817454.png', '2024-03-07 21:17:34');
+INSERT INTO `tbl_item` (`item_code`, `item_name`, `category_id`, `size_id`, `quantity`, `status`, `description`, `img_path`, `date_created`) VALUES
+('3x2pno', 'vvxc', 3, 2, 0, 0, 'dsfsd', 'vvxc1709923244.png', '2024-03-09 02:40:44'),
+('l4csb7', 'Beaker', 3, 2, 29, 1, 'beaker description', 'Beaker1709819570.png', '2024-03-07 21:52:50'),
+('ls6w95', 'TEST CATEGORY', 3, 2, 123, 1, 'CADAS', 'TEST CATEGORY1709825943.png', '2024-03-07 23:39:03'),
+('ohb5s6', '123123', 4, 2, 22, 1, 'descriptiontgesst1', '1231231709817454.png', '2024-03-07 21:17:34');
 
 -- --------------------------------------------------------
 
@@ -177,11 +189,19 @@ DROP TABLE IF EXISTS `tbl_penalty`;
 CREATE TABLE IF NOT EXISTS `tbl_penalty` (
   `penalty_id` int NOT NULL AUTO_INCREMENT,
   `transaction_no` int NOT NULL,
-  `amount` double(50,2) NOT NULL,
+  `amount` double(50,2) DEFAULT '100.00',
   `status` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`penalty_id`),
   KEY `fk_pen_trans_no` (`transaction_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_penalty`
+--
+
+INSERT INTO `tbl_penalty` (`penalty_id`, `transaction_no`, `amount`, `status`) VALUES
+(2, 95107349, 100.00, 1),
+(6, 57644223, 100.00, 1);
 
 -- --------------------------------------------------------
 
@@ -194,10 +214,21 @@ CREATE TABLE IF NOT EXISTS `tbl_retirement` (
   `retirement_id` int NOT NULL AUTO_INCREMENT,
   `item_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `quantity` int NOT NULL,
-  `remarks` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `remarks` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `date_retirement` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`retirement_id`),
   KEY `fk_item_code2` (`item_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_retirement`
+--
+
+INSERT INTO `tbl_retirement` (`retirement_id`, `item_code`, `quantity`, `remarks`, `date_retirement`) VALUES
+(10, '3x2pno', 1, '1', '2024-03-09 02:41:05'),
+(11, '3x2pno', 1, 'fdsf', '2024-03-09 02:41:17'),
+(12, '3x2pno', 1, 'fdsfs', '2024-03-09 02:42:21'),
+(13, '3x2pno', 1, 'sdfds', '2024-03-09 02:42:25');
 
 -- --------------------------------------------------------
 
@@ -222,6 +253,33 @@ INSERT INTO `tbl_size` (`size_id`, `size_description`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbl_stock_in`
+--
+
+DROP TABLE IF EXISTS `tbl_stock_in`;
+CREATE TABLE IF NOT EXISTS `tbl_stock_in` (
+  `stock_id` int NOT NULL AUTO_INCREMENT,
+  `item_code` varchar(100) NOT NULL,
+  `old_quantity` int NOT NULL,
+  `added_quantity` int NOT NULL,
+  `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`stock_id`),
+  KEY `fk_stock_item_code` (`item_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tbl_stock_in`
+--
+
+INSERT INTO `tbl_stock_in` (`stock_id`, `item_code`, `old_quantity`, `added_quantity`, `date_added`) VALUES
+(2, 'l4csb7', 25, 2, '2024-03-09 01:08:01'),
+(3, 'l4csb7', 27, 2, '2024-03-09 01:08:18'),
+(8, '3x2pno', 0, 2, '2024-03-09 02:40:57'),
+(9, '3x2pno', 0, 2, '2024-03-09 02:42:10');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_transaction_detail`
 --
 
@@ -236,15 +294,35 @@ CREATE TABLE IF NOT EXISTS `tbl_transaction_detail` (
   PRIMARY KEY (`trans_item_id`),
   KEY `fk_dtl_item_code` (`item_code`),
   KEY `fk_dtl_transaction_no` (`transaction_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `tbl_transaction_detail`
 --
 
 INSERT INTO `tbl_transaction_detail` (`trans_item_id`, `transaction_no`, `item_code`, `quantity`, `return_quantity`, `status`) VALUES
-(7, 20294498, 'ohb5s6', 2, 0, 2),
-(8, 20294498, 'ls6w95', 2, 0, 2);
+(7, 20294498, 'ohb5s6', 2, 2, 0),
+(8, 20294498, 'ls6w95', 2, 2, 0),
+(10, 57837994, 'ohb5s6', 1, 0, 5),
+(11, 57837994, 'l4csb7', 2, 0, 5),
+(13, 5899442, 'ohb5s6', 1, 0, 5),
+(14, 5899442, 'l4csb7', 1, 0, 5),
+(16, 98268094, 'ohb5s6', 1, 1, 0),
+(17, 98268094, 'l4csb7', 2, 2, 0),
+(19, 21680979, 'ohb5s6', 1, 1, 0),
+(20, 21680979, 'l4csb7', 1, 1, 0),
+(22, 48590568, 'ohb5s6', 1, 1, 0),
+(23, 48590568, 'l4csb7', 2, 2, 0),
+(25, 5428495, 'ohb5s6', 1, 1, 0),
+(26, 5428495, 'l4csb7', 1, 1, 0),
+(28, 95274448, 'ohb5s6', 1, 1, 0),
+(29, 95274448, 'l4csb7', 1, 1, 0),
+(31, 35480184, 'ohb5s6', 1, 1, 0),
+(32, 35480184, 'l4csb7', 1, 1, 0),
+(34, 95107349, 'ohb5s6', 1, 1, 0),
+(35, 95107349, 'l4csb7', 1, 1, 0),
+(37, 10342428, 'ohb5s6', 1, 0, 5),
+(38, 57644223, 'ohb5s6', 1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -270,7 +348,18 @@ CREATE TABLE IF NOT EXISTS `tbl_transaction_header` (
 --
 
 INSERT INTO `tbl_transaction_header` (`transaction_no`, `borrower_id`, `start_date`, `expected_return_date`, `return_date`, `status`, `date_created`) VALUES
-(20294498, '312312', '2024-03-08', '2024-03-13', '0000-00-00', 2, '2024-03-08 15:22:58');
+(5428495, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 07:23:06'),
+(5899442, '312312', '0000-00-00', '0000-00-00', '0000-00-00', 5, '2024-03-08 23:21:14'),
+(10342428, '312312', '0000-00-00', '0000-00-00', '0000-00-00', 5, '2024-03-09 08:04:00'),
+(20294498, '312312', '2024-03-08', '2024-03-13', '2024-03-08', 0, '2024-03-08 15:22:58'),
+(21680979, '312312', '2024-03-08', '2024-03-13', '2024-03-08', 0, '2024-03-09 07:19:07'),
+(35480184, '312312', '2024-03-08', '2024-03-13', '2024-03-09', 0, '2024-03-09 07:31:58'),
+(48590568, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 07:21:01'),
+(57644223, '12312', '2024-03-09', '2024-03-08', '2024-03-09', 0, '2024-03-09 09:30:07'),
+(57837994, '312312', '0000-00-00', '0000-00-00', '0000-00-00', 4, '2024-03-08 22:57:55'),
+(95107349, '312312', '2024-03-09', '2024-03-08', '2024-03-09', 0, '2024-03-09 07:34:03'),
+(95274448, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 07:28:48'),
+(98268094, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 02:47:54');
 
 --
 -- Constraints for dumped tables
@@ -306,7 +395,13 @@ ALTER TABLE `tbl_penalty`
 -- Constraints for table `tbl_retirement`
 --
 ALTER TABLE `tbl_retirement`
-  ADD CONSTRAINT `fk_item_code2` FOREIGN KEY (`item_code`) REFERENCES `tbl_item` (`item_code`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk_item_code2` FOREIGN KEY (`item_code`) REFERENCES `tbl_item` (`item_code`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `tbl_stock_in`
+--
+ALTER TABLE `tbl_stock_in`
+  ADD CONSTRAINT `fk_stock_item_code` FOREIGN KEY (`item_code`) REFERENCES `tbl_item` (`item_code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tbl_transaction_detail`

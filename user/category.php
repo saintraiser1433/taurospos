@@ -1,6 +1,6 @@
 <?php
 include '../connection.php';
-if(!isset($_SESSION['borrower_id'])){
+if (!isset($_SESSION['borrower_id'])) {
   header("Location:../index.php");
 }
 
@@ -12,7 +12,7 @@ if(!isset($_SESSION['borrower_id'])){
 
 <html lang="en">
 <?php include '../components/head.php' ?>
-<?php include '../components/script.php' ?>
+
 <body class=" layout-fluid">
 
   <div class="page">
@@ -173,6 +173,19 @@ if(!isset($_SESSION['borrower_id'])){
 
 </html>
 <script>
+  $(window).bind('unload', function() {
+    $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 2,
+        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
+      },
+      success: function(html) {
+
+      }
+    });
+  });
   $(document).ready(function() {
     let id = 0;
     $(document).on('click', '.add', function() {

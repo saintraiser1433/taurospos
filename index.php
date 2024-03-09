@@ -9,8 +9,18 @@ if (isset($_POST['submit'])) {
         $rs = $conn->query($sql);
         if ($rs->num_rows > 0) {
             $row = $rs->fetch_assoc();
-            $_SESSION['admin_id'] = $row['admin_id'];
-            header("Location:admin/index.php");
+            if ($row['stat'] == 1) {
+                $_SESSION['response'] = 'Existing Active Session';
+                $_SESSION['type'] = 'warning';
+            } else {
+                $admin = $row['admin_id'];
+                $_SESSION['admin_id'] = $row['admin_id'];
+                $updateSql = "UPDATE tbl_admin SET login_session = 1 where admin_id='$admin'";
+                $conn->query($updateSql);
+                header("Location:admin/index.php");
+                
+            }
+          
         } else {
             $_SESSION['response'] = "Incorrect Credentials";
             $_SESSION['type'] = "error";
@@ -27,9 +37,17 @@ if (isset($_POST['submit'])) {
                 $_SESSION['response'] = 'Your account is In-active kindly contact the administrator regarding in your account';
                 $_SESSION['type'] = 'warning';
             } else {
-                $_SESSION['name'] = $row['last_name'] . ", " . $row['first_name'];
-                $_SESSION['borrower_id'] = $row['borrower_id'];
-                header("Location:user/index.php");
+                if ($row['stat'] == 1) {
+                    $_SESSION['response'] = 'Existing Active Session';
+                    $_SESSION['type'] = 'warning';
+                } else {
+                    $borrow = $row['borrower_id'];
+                    $_SESSION['name'] = $row['last_name'] . ", " . $row['first_name'];
+                    $_SESSION['borrower_id'] = $row['borrower_id'];
+                    $updateSql = "UPDATE tbl_borrower SET login_session = 1 where borrower_id='$borrow'";
+                    $conn->query($updateSql);
+                    header("Location:user/index.php");
+                }
             }
         } else {
             $_SESSION['response'] = "Incorrect Credentials";
@@ -45,7 +63,7 @@ if (isset($_POST['submit'])) {
 <html lang="en">
 
 <?php
-    include 'components/indexheader.php'
+include 'components/indexheader.php'
 
 ?>
 
@@ -96,7 +114,7 @@ if (isset($_POST['submit'])) {
 
                         <div class="d-flex flex-column align-items-center mt-3">
                             <a href="signup.php">No account? Registered Here!</a>
-                            
+
                             <?php
                             if (isset($_GET['us3r']) == 'admin') {
                                 echo '<a href="index.php">Login as user</a>';
