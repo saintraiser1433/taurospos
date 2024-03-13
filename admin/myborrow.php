@@ -128,7 +128,7 @@ if (!isset($_GET['trans_no'])) {
                             }
                             ?>
                           </td>
-                          
+
                         </tr>
                       <?php } ?>
                     </tbody>
@@ -164,9 +164,6 @@ if (!isset($_GET['trans_no'])) {
         type: 1,
         admin_id: <?php echo $_SESSION['admin_id'] ?>
       },
-      success: function(html) {
-
-      }
     });
   });
   $(document).ready(function() {

@@ -206,9 +206,6 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
         type: 1,
         admin_id: <?php echo $_SESSION['admin_id'] ?>
       },
-      success: function(html) {
-
-      }
     });
   });
 

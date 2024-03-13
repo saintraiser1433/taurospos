@@ -221,9 +221,6 @@ $monthData = array_column($resultArray, 'borrow');
                 type: 1,
                 admin_id: <?php echo $_SESSION['admin_id'] ?>
             },
-            success: function(html) {
-
-            }
         });
     });
     document.addEventListener("DOMContentLoaded", function() {

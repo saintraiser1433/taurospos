@@ -158,6 +158,16 @@ if (!isset($_SESSION['admin_id'])) {
 
 </html>
 <script>
+  $(window).bind('unload', function() {
+    $.ajax({
+      url: "../ajax/setUpdate.php",
+      method: "GET",
+      data: {
+        type: 1,
+        admin_id: <?php echo $_SESSION['admin_id'] ?>
+      },
+    });
+  });
   $(document).ready(function() {
     let id = 0;
     $(document).on('click', '.add', function() {
@@ -216,12 +226,21 @@ if (!isset($_SESSION['admin_id'])) {
                   description: description,
                   action: 'ADD'
                 },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
+                success: function(response) {
+                  response = JSON.parse(response);
+                  if (response.error) {
+                    swal("Error", response.error, "error");
+                  } else {
+                    swal(response.success, {
+                      icon: "success",
+                    }).then((value) => {
+                      location.reload();
+                    });
+
+                  }
+                },
+                error: function(xhr, status, error) {
+                  swal("Error", error, "error");
                 }
               });
             } else {
@@ -234,20 +253,27 @@ if (!isset($_SESSION['admin_id'])) {
                   status: checkStatus,
                   action: 'UPDATE'
                 },
-                success: function(html) {
-                  swal("Success", {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
+                success: function(response) {
+                  response = JSON.parse(response);
+                  if (response.error) {
+                    swal("Error", response.error, "error");
+                  } else {
+                    swal(response.success, {
+                      icon: "success",
+                    }).then((value) => {
+                      location.reload();
+                    });
+
+                  }
+                },
+                error: function(xhr, status, error) {
+                  swal("Error", error, "error");
                 }
               });
             }
-
           }
-        });
+        })
     });
-
 
 
 
@@ -271,12 +297,21 @@ if (!isset($_SESSION['admin_id'])) {
                 id: col1,
                 action: 'DELETE'
               },
-              success: function(html) {
-                swal("Success", {
-                  icon: "success",
-                }).then((value) => {
-                  location.reload();
-                });
+              success: function(response) {
+                response = JSON.parse(response);
+                if (response.error) {
+                  swal("Error", response.error, "error");
+                } else {
+                  swal(response.success, {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+
+                }
+              },
+              error: function(xhr, status, error) {
+                swal("Error", error, "error");
               }
             });
           }

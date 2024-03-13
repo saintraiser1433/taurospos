@@ -81,9 +81,15 @@ if (!isset($_SESSION['admin_id'])) {
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-category">
+                            Date Paid
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-category">
                             Action
                           </button>
                         </th>
+
                         <th class="d-none"></th>
 
                       </tr>
@@ -102,7 +108,9 @@ if (!isset($_SESSION['admin_id'])) {
                           c.last_name,
                           ' ',
                           LEFT(c.middle_name, 1)
-                      ) AS borrower_name
+                         
+                      ) AS borrower_name,
+                      a.date_paid
                   FROM
                       tbl_penalty a
                   INNER JOIN tbl_transaction_header b ON
@@ -127,10 +135,22 @@ if (!isset($_SESSION['admin_id'])) {
                                                                     }
                                                                     ?>
                           </td>
+                          <td>
+                            <?php
+                            if ($row['date_paid'] == '0000-00-00') {
+                              echo '-';
+                            } else {
+                              echo date('M-d-Y', strtotime($row['date_paid']));
+                            }
+
+                            ?>
+                          </td>
                           <td class="sort-category text-capitalize">
                             <?php
                             if ($row['status'] == 0) {
                               echo '<a href="#" class="badge bg-success paid   text-decoration-none" title="Paid"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg></a>';
+                            } else {
+                              echo '-';
                             }
                             ?>
 
@@ -174,9 +194,6 @@ if (!isset($_SESSION['admin_id'])) {
         type: 1,
         admin_id: <?php echo $_SESSION['admin_id'] ?>
       },
-      success: function(html) {
-
-      }
     });
   });
   $(document).ready(function() {
@@ -184,7 +201,7 @@ if (!isset($_SESSION['admin_id'])) {
     $(document).on('click', '.paid', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(6)").text();
+      var col1 = currentRow.find("td:eq(7)").text();
       swal({
           title: "Are you sure?",
           text: "This borrower is paid? this can't be undo",

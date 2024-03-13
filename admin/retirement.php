@@ -150,9 +150,6 @@ if (!isset($_SESSION['admin_id'])) {
         type: 1,
         admin_id: <?php echo $_SESSION['admin_id'] ?>
       },
-      success: function(html) {
-
-      }
     });
   });
   let counter = parseInt($('#counter').val());

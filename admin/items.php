@@ -211,9 +211,6 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
         type: 1,
         admin_id: <?php echo $_SESSION['admin_id'] ?>
       },
-      success: function(html) {
-
-      }
     });
   });
 

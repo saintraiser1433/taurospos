@@ -147,9 +147,6 @@ $id = $_SESSION['borrower_id'];
         type: 2,
         borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
       },
-      success: function(html) {
-
-      }
     });
   });
   $(document).ready(function() {

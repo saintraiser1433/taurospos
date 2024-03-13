@@ -93,16 +93,16 @@
               </span>
             </a>
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="./report.php" rel=" noopener">
+              <a class="dropdown-item" href="./report.php?type=transaction" rel=" noopener">
                 Transaction
               </a>
-              <a class="dropdown-item" href="./report.php" rel=" noopener">
+              <a class="dropdown-item" href="./report.php?type=penalties" rel=" noopener">
                 Penalties
               </a>
-              <a class="dropdown-item" href="./report.php" rel="noopener">
+              <a class="dropdown-item" href="./report.php?type=stock" rel="noopener">
                 Stock In
               </a>
-              <a class="dropdown-item" href="./report.php" rel="noopener">
+              <a class="dropdown-item" href="./report.php?type=retirement" rel="noopener">
                 Retirement
               </a>
 

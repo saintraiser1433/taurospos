@@ -5,6 +5,8 @@ if (!isset($_SESSION['admin_id'])) {
   header("Location:../index.php");
 }
 
+
+
 ?>
 
 <!doctype html>
@@ -33,7 +35,27 @@ if (!isset($_SESSION['admin_id'])) {
                     <div class="col-lg-12">
                       <div class="card">
                         <div class="card-body">
-                          <h2 class="h2 text-center mb-4">Report Name: Transactional Report</h2>
+                          <h2 class="h2 text-center mb-4">
+                            <?php
+
+                            if (isset($_GET['type'])) {
+                              if ($_GET['type'] == 'penalties') {
+                                echo 'PENALTY REPORT';
+                              } else if ($_GET['type'] == 'stock') {
+                                echo 'STOCK REPORT';
+                              } else if ($_GET['type'] == 'retirement') {
+                                echo 'RETIREMENT REPORT';
+                              } else {
+                                echo 'Transactional Report';
+                              }
+                            } else {
+                              echo 'Transactional Report';
+                            }
+
+
+                            ?>
+
+                          </h2>
                           <form action="" method="post">
                             <div class="col-lg-12 mt-3">
                               <div class="row">
@@ -52,7 +74,7 @@ if (!isset($_SESSION['admin_id'])) {
                                           <path d="M12 15v3" />
                                         </svg>
                                       </span>
-                                      <input class="form-control fromdate" placeholder="Select a date" id="datepicker-icon-prepend" value="2020-06-20" />
+                                      <input class="form-control fromdate" placeholder="Select a date" id="datepicker-icon-prepend" value="2024-03-01" />
                                     </div>
                                   </div>
                                 </div>
@@ -71,12 +93,15 @@ if (!isset($_SESSION['admin_id'])) {
                                           <path d="M12 15v3" />
                                         </svg>
                                       </span>
-                                      <input class="form-control todate" placeholder="Select a date" id="datepicker-icon-prepend" value="2020-06-20" />
+                                      <input class="form-control todate" placeholder="Select a date" id="datepicker-to" value="2024-03-25" />
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                              <div class="row">
+                              <?php
+                              if (isset($_GET['type'])) {
+                                if ($_GET['type'] == 'transaction') {
+                                  echo ' <div class="row">
                                 <div class="col-lg-12">
                                   <div class="mb-3">
                                     <label class="form-label">Type</label>
@@ -92,7 +117,11 @@ if (!isset($_SESSION['admin_id'])) {
                                     </select>
                                   </div>
                                 </div>
-                              </div>
+                              </div>';
+                                }
+                              }
+                              ?>
+
                             </div>
                             <div class="form-footer">
                               <button type="button" name="submit" class="btn btn-primary w-100 print">Print</button>
@@ -128,9 +157,6 @@ if (!isset($_SESSION['admin_id'])) {
         type: 1,
         admin_id: <?php echo $_SESSION['admin_id'] ?>
       },
-      success: function(html) {
-
-      }
     });
   });
   $(document).ready(function() {
@@ -139,21 +165,38 @@ if (!isset($_SESSION['admin_id'])) {
       let fromdate = $('.fromdate').val();
       let todate = $('.todate').val();
       let itemType = $('.itemType').val();
+      let action = '<?php echo $_GET['type'] ?>';
       $.ajax({
         url: "../ajax/generate_trans_report.php",
         method: "POST",
         data: {
           fromdate: fromdate,
           todate: todate,
-          itemType: itemType
+          itemType: itemType,
+          action: action
         },
         success: function(html) {
           if (html == 'No data found') {
             toastr.error("No data found");
           } else {
-            setInterval(function() {
-              window.location.href = '../reports/outputs/transaction.pdf';
-            }, 1000);
+            if (action == 'transaction') {
+              setInterval(function() {
+                window.location.href = '../reports/outputs/transaction.pdf';
+              }, 1000);
+            } else if (action == 'penalties') {
+              setInterval(function() {
+                window.location.href = '../reports/outputs/penalties.pdf';
+              }, 1000);
+            } else if (action == 'stock') {
+              setInterval(function() {
+                window.location.href = '../reports/outputs/stockin.pdf';
+              }, 1000);
+            } else if (action == 'retirement') {
+              setInterval(function() {
+                window.location.href = '../reports/outputs/retirement.pdf';
+              }, 1000);
+            }
+
           }
 
         }

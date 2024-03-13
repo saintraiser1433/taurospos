@@ -131,7 +131,7 @@ if (!isset($_GET['code'])) {
 </html>
 
 <script>
-  $(window).bind('unload', function() {
+    $(window).bind('unload', function() {
     $.ajax({
       url: "../ajax/setUpdate.php",
       method: "GET",
@@ -139,9 +139,6 @@ if (!isset($_GET['code'])) {
         type: 2,
         borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
       },
-      success: function(html) {
-
-      }
     });
   });
   let counter = parseInt($('#counter').val());
