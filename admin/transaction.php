@@ -258,7 +258,7 @@ if (!isset($_SESSION['admin_id'])) {
             }
             if (item.status == 1 || item.status == 2) {
               $('#act').show();
-              $('.thedata').append(
+              $('.thedata').html(
                 `<tr>
                 <td>${item.item_name}</td>
                 <td>${item.qty}</td>
@@ -316,10 +316,6 @@ if (!isset($_SESSION['admin_id'])) {
         }
       });
     }
-
-
-
-
 
     $(document).on('click', '.details', function() {
       $tr = $(this).closest('tr');

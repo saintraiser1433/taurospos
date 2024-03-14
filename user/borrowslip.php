@@ -105,7 +105,7 @@ if (!isset($_GET['code'])) {
                         <div class="d-flex justify-content-between align-center">
                           <div class="input-group" style="width:140px">
                             <button class="input-group-text" id="minus">-</button>
-                            <input type="text" class="form-control text-center" id="counter" value="1" autocomplete="off" readonly>
+                            <input type="text" class="form-control text-center" id="counter" value="1" autocomplete="off" data-current-quantity=<?php echo $row['quantity'] ?> readonly>
                             <button class="input-group-text" id="add">+</button>
                           </div>
                         </div>
@@ -131,7 +131,7 @@ if (!isset($_GET['code'])) {
 </html>
 
 <script>
-    $(window).bind('unload', function() {
+  $(window).bind('unload', function() {
     $.ajax({
       url: "../ajax/setUpdate.php",
       method: "GET",
@@ -143,18 +143,22 @@ if (!isset($_GET['code'])) {
   });
   let counter = parseInt($('#counter').val());
 
-  $('#add').on('click', function() {
-    counter += 1;
-    $('#counter').val(counter)
+  $(document).on('click', '#add', function() {
+    var counterElement = $(this).siblings('input');
+    var currentValue = parseInt(counterElement.val());
+    var currentQuantity = parseInt(counterElement.data('current-quantity'));
+
+    if (currentValue < currentQuantity) {
+      counterElement.val(currentValue + 1);
+    }
   });
 
-  $('#minus').on('click', function() {
-    counter -= 1;
-    if (counter < 1) {
-      counter = 1;
+  $(document).on('click', '#minus', function() {
+    var counterElement = $(this).siblings('input');
+    var currentValue = parseInt(counterElement.val());
+    if (currentValue > 1) {
+      counterElement.val(currentValue - 1);
     }
-    $('#counter').val(counter);
-
   });
 
 

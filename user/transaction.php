@@ -94,14 +94,13 @@ if (!isset($_SESSION['borrower_id'])) {
                       </tr>
                     </thead>
                     <tbody class="table-tbody" id="append-transaction">
-
                     </tbody>
                   </table>
                   <br>
-                  <div class="btn-toolbar">
+                  <!-- <div class="btn-toolbar">
                     <p class="mb-0" id="listjs-showing-items-label">Showing 0 items</p>
                     <ul class="pagination ms-auto mb-0"></ul>
-                  </div>
+                  </div> -->
                 </div>
 
               </div>
@@ -120,6 +119,9 @@ if (!isset($_SESSION['borrower_id'])) {
 
 </html>
 <script>
+
+
+
   $(window).bind('unload', function() {
     $.ajax({
       url: "../ajax/setUpdate.php",
@@ -130,6 +132,15 @@ if (!isset($_SESSION['borrower_id'])) {
       },
     });
   });
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getMonth()].toLowerCase();
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}-${day}-${year}`;
+  }
 
   function getTransaction() {
     $.ajax({
@@ -142,17 +153,48 @@ if (!isset($_SESSION['borrower_id'])) {
         $('#append-transaction').empty();
         for (var i = 0; i < html.length; i++) {
           var item = html[i];
+          let startDate;
+          let erd;
+          let rd;
+          let status;
+          let listJsInstance;
+          if (item.start_date == '0000-00-00') {
+            startDate = "-";
+          } else {
+            startDate = formatDate(item.start_date);
+          }
+          if (item.expected_return_date == '0000-00-00') {
+            erd = "-";
+          } else {
+            erd = formatDate(item.expected_return_date);
+          }
+          if (item.return_date == '0000-00-00') {
+            rd = "-";
+          } else {
+            rd = formatDate(item.return_date);
+          }
+
+          if (item.status == 1) {
+            status = '<span class="badge badge-sm bg-info text-uppercase ms-auto text-white">Partially Returned</span>';
+          } else if (item.status == 2) {
+            status = '<span class="badge badge-sm bg-warning text-uppercase ms-auto text-white">Waiting to Returned</span>';
+          } else if (item.status == 3) {
+            status = '<span class="badge badge-sm bg-teal text-uppercase ms-auto text-white">Waiting to Claim</span>';
+          } else if (item.status == 6) {
+            status = '<span class="badge badge-sm bg-secondary text-uppercase ms-auto text-white">For Approval</span>';
+          }
 
 
-          $('#append-transaction').append(
+
+          $('#append-transaction').html(
             `
             <tr>
             <td class="sort-id">${item.transaction_no}</td>
             <td class="sort-id text-capitalize">${item.borrower_name}</td>
-            <td class="sort-id text-capitalize">${item.start_date}</td>
-            <td class="sort-id text-capitalize">${item.expected_return_date}</td>
-            <td class="sort-id text-capitalize">${item.return_date}</td>
-            <td class="sort-id text-capitalize">${item.status}</td>
+            <td class="sort-id text-capitalize">${startDate}</td>
+            <td class="sort-id text-capitalize">${erd}</td>
+            <td class="sort-id text-capitalize">${rd}</td>
+            <td class="sort-id text-capitalize">${status}</td>
             <td><a href="#" class="badge bg-primary details text-decoration-none" title="View Details">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-details" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -160,10 +202,13 @@ if (!isset($_SESSION['borrower_id'])) {
                                 <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
                               </svg>
                             </a></td>
-            <td></td>
             </tr>
             `
           );
+
+          // if (listJsInstance) {
+          //   listJsInstance.reIndex();
+          // }
 
 
 
@@ -172,7 +217,7 @@ if (!isset($_SESSION['borrower_id'])) {
     });
   }
 
-  setInterval(getTransaction,500)
+  setInterval(getTransaction, 500)
 
   $(document).ready(function() {
     $(document).on('click', '.cancel', function(e) {
