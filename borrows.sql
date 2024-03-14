@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 09, 2024 at 03:01 AM
+-- Generation Time: Mar 14, 2024 at 02:46 AM
 -- Server version: 8.2.0
--- PHP Version: 7.4.33
+-- PHP Version: 8.2.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `tbl_admin` (
 --
 
 INSERT INTO `tbl_admin` (`admin_id`, `username`, `password`, `login_session`) VALUES
-(1, 'admin', 'admin', 0);
+(1, 'admin', 'admin', 1);
 
 -- --------------------------------------------------------
 
@@ -93,16 +93,7 @@ CREATE TABLE IF NOT EXISTS `tbl_cart` (
   PRIMARY KEY (`cart_id`),
   KEY `fk_cart_item_code` (`item_code`),
   KEY `fk_cart_borrower_id` (`borrower_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `tbl_cart`
---
-
-INSERT INTO `tbl_cart` (`cart_id`, `item_code`, `quantity`, `borrower_id`) VALUES
-(58, 'ohb5s6', 1, '12312'),
-(59, 'l4csb7', 1, '12312'),
-(60, 'l4csb7', 1, '12312');
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -177,7 +168,7 @@ INSERT INTO `tbl_item` (`item_code`, `item_name`, `category_id`, `size_id`, `qua
 ('3x2pno', 'vvxc', 3, 2, 0, 0, 'dsfsd', 'vvxc1709923244.png', '2024-03-09 02:40:44'),
 ('l4csb7', 'Beaker', 3, 2, 29, 1, 'beaker description', 'Beaker1709819570.png', '2024-03-07 21:52:50'),
 ('ls6w95', 'TEST CATEGORY', 3, 2, 123, 1, 'CADAS', 'TEST CATEGORY1709825943.png', '2024-03-07 23:39:03'),
-('ohb5s6', '123123', 4, 2, 22, 1, 'descriptiontgesst1', '1231231709817454.png', '2024-03-07 21:17:34');
+('ohb5s6', '123123', 4, 2, 21, 1, 'descriptiontgesst1', '1231231709817454.png', '2024-03-07 21:17:34');
 
 -- --------------------------------------------------------
 
@@ -191,6 +182,7 @@ CREATE TABLE IF NOT EXISTS `tbl_penalty` (
   `transaction_no` int NOT NULL,
   `amount` double(50,2) DEFAULT '100.00',
   `status` int NOT NULL DEFAULT '0',
+  `date_paid` date NOT NULL DEFAULT '0000-00-00',
   PRIMARY KEY (`penalty_id`),
   KEY `fk_pen_trans_no` (`transaction_no`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -199,9 +191,9 @@ CREATE TABLE IF NOT EXISTS `tbl_penalty` (
 -- Dumping data for table `tbl_penalty`
 --
 
-INSERT INTO `tbl_penalty` (`penalty_id`, `transaction_no`, `amount`, `status`) VALUES
-(2, 95107349, 100.00, 1),
-(6, 57644223, 100.00, 1);
+INSERT INTO `tbl_penalty` (`penalty_id`, `transaction_no`, `amount`, `status`, `date_paid`) VALUES
+(2, 95107349, 100.00, 1, '0000-00-00'),
+(6, 57644223, 100.00, 1, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -294,7 +286,7 @@ CREATE TABLE IF NOT EXISTS `tbl_transaction_detail` (
   PRIMARY KEY (`trans_item_id`),
   KEY `fk_dtl_item_code` (`item_code`),
   KEY `fk_dtl_transaction_no` (`transaction_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `tbl_transaction_detail`
@@ -322,7 +314,11 @@ INSERT INTO `tbl_transaction_detail` (`trans_item_id`, `transaction_no`, `item_c
 (34, 95107349, 'ohb5s6', 1, 1, 0),
 (35, 95107349, 'l4csb7', 1, 1, 0),
 (37, 10342428, 'ohb5s6', 1, 0, 5),
-(38, 57644223, 'ohb5s6', 1, 1, 0);
+(38, 57644223, 'ohb5s6', 1, 1, 0),
+(39, 20137544, 'ohb5s6', 3, 3, 0),
+(40, 94758253, 'ohb5s6', 1, 0, 2),
+(41, 12877089, 'l4csb7', 1, 0, 4),
+(42, 12877089, 'ohb5s6', 1, 0, 4);
 
 -- --------------------------------------------------------
 
@@ -351,12 +347,15 @@ INSERT INTO `tbl_transaction_header` (`transaction_no`, `borrower_id`, `start_da
 (5428495, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 07:23:06'),
 (5899442, '312312', '0000-00-00', '0000-00-00', '0000-00-00', 5, '2024-03-08 23:21:14'),
 (10342428, '312312', '0000-00-00', '0000-00-00', '0000-00-00', 5, '2024-03-09 08:04:00'),
+(12877089, '12312', '0000-00-00', '0000-00-00', '0000-00-00', 6, '2024-03-14 10:44:40'),
+(20137544, '12312', '2024-03-09', '2024-03-14', '2024-03-09', 0, '2024-03-09 16:01:33'),
 (20294498, '312312', '2024-03-08', '2024-03-13', '2024-03-08', 0, '2024-03-08 15:22:58'),
 (21680979, '312312', '2024-03-08', '2024-03-13', '2024-03-08', 0, '2024-03-09 07:19:07'),
 (35480184, '312312', '2024-03-08', '2024-03-13', '2024-03-09', 0, '2024-03-09 07:31:58'),
 (48590568, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 07:21:01'),
 (57644223, '12312', '2024-03-09', '2024-03-08', '2024-03-09', 0, '2024-03-09 09:30:07'),
 (57837994, '312312', '0000-00-00', '0000-00-00', '0000-00-00', 4, '2024-03-08 22:57:55'),
+(94758253, '12312', '2024-03-14', '2024-03-19', '0000-00-00', 2, '2024-03-14 09:54:58'),
 (95107349, '312312', '2024-03-09', '2024-03-08', '2024-03-09', 0, '2024-03-09 07:34:03'),
 (95274448, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 07:28:48'),
 (98268094, '312312', '2024-03-08', '2024-03-08', '2024-03-08', 0, '2024-03-09 02:47:54');
