@@ -152,20 +152,11 @@ if (!isset($_SESSION['borrower_id'])) {
   <?php include '../components/script.php' ?>
 
 </body>
-
+<?php include '../dist/xx_close_api_user.php' ?>
 </html>
 
 <script>
-  $(window).bind('unload', function() {
-    $.ajax({
-      url: "../ajax/setUpdate.php",
-      method: "GET",
-      data: {
-        type: 2,
-        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
-      },
-    });
-  });
+ 
   $(document).ready(function() {
 
     $(document).on('click', '.paid', function(e) {

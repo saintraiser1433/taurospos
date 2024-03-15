@@ -212,19 +212,10 @@ if (!isset($_SESSION['admin_id'])) {
 
 
 </body>
+<?php include '../dist/xx_close_api_admin.php' ?>
 
 </html>
 <script>
-  $(window).bind('unload', function() {
-    $.ajax({
-      url: "../ajax/setUpdate.php",
-      method: "GET",
-      data: {
-        type: 1,
-        admin_id: <?php echo $_SESSION['admin_id'] ?>
-      },
-    });
-  });
   $(document).ready(function() {
 
     function getDetails(data) {

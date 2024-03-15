@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             description,
             img_path
         ) 
-        VALUES ('$itemCode','$itemName',$itemCategory,$itemSize,1,'$itemDescription','$dir')";
+        VALUES ('$itemCode','$itemName',$itemCategory,$itemSize,0,'$itemDescription','$dir')";
         $conn->query($sql);
     } else if ($action == 'UPDATE') {
         $itemCode = $_POST['itemCode'];
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             added_quantity
         ) 
         VALUES ('$itemCode',$qty,$added)";
-        $sqlupqty = "UPDATE tbl_item SET quantity=quantity+$added where item_code='$itemCode'";
+        $sqlupqty = "UPDATE tbl_item SET quantity=quantity+$added,status=1 where item_code='$itemCode'";
         $conn->query($sqlupqty);
         $conn->query($sql);
     } else if ($action == 'RETIRE') {

@@ -195,20 +195,10 @@ if (isset($_GET['stat']) && $_GET['stat'] != '' && isset($_GET['brw']) && $_GET[
   <?php include '../components/script.php' ?>
 
 </body>
+<?php include '../dist/xx_close_api_admin.php' ?>
 
 </html>
 <script>
-  $(window).bind('unload', function() {
-    $.ajax({
-      url: "../ajax/setUpdate.php",
-      method: "GET",
-      data: {
-        type: 1,
-        admin_id: <?php echo $_SESSION['admin_id'] ?>
-      },
-    });
-  });
-
   function getDetails(data) {
     $.ajax({
       method: "POST",

@@ -210,19 +210,13 @@ $monthData = array_column($resultArray, 'borrow');
 </body>
 
 </html>
+
 <script src="../dist/libs/apexcharts/dist/apexcharts.min.js?1684106062" defer></script>
+<?php include '../dist/xx_close_api_admin.php' ?>
 <script>
-    // @formatter:off
-    $(window).bind('unload', function() {
-        $.ajax({
-            url: "../ajax/setUpdate.php",
-            method: "GET",
-            data: {
-                type: 1,
-                admin_id: <?php echo $_SESSION['admin_id'] ?>
-            },
-        });
-    });
+ 
+
+
     document.addEventListener("DOMContentLoaded", function() {
         var cntData = <?php echo json_encode($cntData); ?>;
         var monthData = <?php echo json_encode($monthData); ?>;

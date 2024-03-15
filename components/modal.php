@@ -91,7 +91,7 @@
           <select class="form-select text-capitalize" name="selectItemName" id="selectItemName" required>
             <option value="" selected>-</option>
             <?php
-            $sql = "SELECT item_code,quantity,item_name FROM tbl_item where status=1 order by item_name asc";
+            $sql = "SELECT item_code,quantity,item_name FROM tbl_item order by item_name asc";
             $rs = $conn->query($sql);
             foreach ($rs as $row) {
             ?>

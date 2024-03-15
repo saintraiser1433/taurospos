@@ -153,21 +153,12 @@ if (!isset($_SESSION['admin_id'])) {
   <?php include '../components/modal.php' ?>
 
   <?php include '../components/script.php' ?>
-
+  <?php include '../dist/xx_close_api_admin.php' ?>
 </body>
 
 </html>
 <script>
-  $(window).bind('unload', function() {
-    $.ajax({
-      url: "../ajax/setUpdate.php",
-      method: "GET",
-      data: {
-        type: 1,
-        admin_id: <?php echo $_SESSION['admin_id'] ?>
-      },
-    });
-  });
+
   $(document).ready(function() {
     let id = 0;
     $(document).on('click', '.add', function() {
