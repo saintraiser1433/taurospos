@@ -2,7 +2,7 @@
 include 'connection.php';
 if (isset($_GET['type'])) {
     if ($_GET['type'] == 1) {
-        $adminid = $_GET['admin_id'];
+        $adminid = $_GET['admin_id'];  
         $sql = "UPDATE tbl_admin SET login_session=0 where admin_id=$adminid";
         $conn->query($sql);
         session_destroy();

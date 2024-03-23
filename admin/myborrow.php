@@ -325,19 +325,19 @@ if (!isset($_GET['trans_no'])) {
                   icon: "success",
                 }).then((value) => {
                   if (html == 'ok') {
-                    $.ajax({
-                      url: "../ajax/sendsms.php",
-                      method: "POST",
-                      data: {
-                        examne: id,
-                        action: 'OVERDUE'
-                      },
-                      dataType: "text",
-                      success: function(html) {
-                        location.reload();
+                    // $.ajax({
+                    //   url: "../ajax/sendsms.php",
+                    //   method: "POST",
+                    //   data: {
+                    //     examne: id,
+                    //     action: 'OVERDUE'
+                    //   },
+                    //   dataType: "text",
+                    //   success: function(html) {
+                    //     location.reload();
 
-                      }
-                    });
+                    //   }
+                    // });
                   }
                   getDetails(transCode)
 

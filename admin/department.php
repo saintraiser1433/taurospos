@@ -233,7 +233,7 @@ if (!isset($_SESSION['admin_id'])) {
                   } else {
                     swal(response.success, {
                       icon: "success",
-                    }).then((value) => {
+                    }).then((value) => {        
                       location.reload();
                     });
 

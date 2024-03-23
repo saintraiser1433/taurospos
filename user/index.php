@@ -59,7 +59,7 @@ if (!isset($_SESSION['borrower_id'])) {
                     <?php } ?>
                   </ul>
                 </div>
-                <div class="card-body w-75">
+                <div class="card-body">
                   <div class="tab-content">
                     <div class="tab-pane active show" id="all">
                       <div class="row" id="cardContainer">
@@ -82,7 +82,7 @@ if (!isset($_SESSION['borrower_id'])) {
                                       a.date_created ASC";
                         $rss = $conn->query($sqls);
                         foreach ($rss as $rows) { ?>
-                          <div class="col-lg-3 pb-2">
+                          <div class="col-lg-2 pb-2">
 
                             <div class="card card-link card-link-pop" onclick="window.location.href='borrowslip.php?code=<?php echo $rows['item_code'] ?>'" style="cursor:pointer">
 
@@ -135,7 +135,7 @@ if (!isset($_SESSION['borrower_id'])) {
                           a.date_created ASC";
                           $rst = $conn->query($sql);
                           foreach ($rst as $rowt) { ?>
-                            <div class="col-lg-3 pb-2">
+                            <div class="col-lg-2 pb-2">
 
                               <div class="card card-link card-link-pop" onclick="window.location.href='borrowslip.php?code=<?php echo $rowt['item_code'] ?>'" style="cursor:pointer">
                                 <?php

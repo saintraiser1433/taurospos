@@ -244,7 +244,8 @@ if (!isset($_SESSION['admin_id'])) {
                 swal("Success", {
                   icon: "success",
                 }).then((value) => {
-                  sendSMS(col1, 'APPROVE');
+                  // sendSMS(col1, 'APPROVE');
+                  location.reload();
                 });
               }
             });
@@ -306,7 +307,8 @@ if (!isset($_SESSION['admin_id'])) {
             swal("Successfull rejected", {
               icon: "success",
             }).then((value) => {
-              sendSMS(col1, 'REJECT');
+              // sendSMS(col1, 'REJECT');
+              location.reload();
             });
           }
         });

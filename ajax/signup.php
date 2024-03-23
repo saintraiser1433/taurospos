@@ -7,7 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         $firstName = $_POST['fname'];
         $middleName = $_POST['mname'];
         $lastName = $_POST['lname'];
-        $phoneNumber = $_POST['phone'];
+        $phoneNumber = "231qwwwwwwwwwwwwwwwwwA63" . $_POST['phone'];
         $departmentId = $_POST['department'];
         $type = $_POST['type'];
         $username = $_POST['username'];

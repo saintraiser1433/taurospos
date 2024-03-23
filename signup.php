@@ -70,7 +70,11 @@ include 'connection.php';
                                             <div class="col-lg-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Phone Number</label>
-                                                    <input type="number" name="phonenumber" class="form-control" id="phonenumber" required>
+                                                    <div class="input-group">
+                                                        <div class="prepend-text bg-teal text-white">+63</div>
+                                                        <input type="number" name="phonenumber" class="form-control" onKeyPress="if(this.value.length==9) return false;" id="phonenumber" required>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -195,7 +199,7 @@ include 'connection.php';
                                     icon: "success",
                                 }).then((value) => {
                                     // location.reload();
-                                    window.location.href="redirecting.php";
+                                    window.location.href = "redirecting.php";
                                 });
                             }
                         });
@@ -204,3 +208,31 @@ include 'connection.php';
         });
     });
 </script>
+
+<style>
+
+    .input-group {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .input-group .prepend-text {
+        display: flex;
+        align-items: center;
+        /* padding: 0.375rem 0.75rem;*/
+        padding: 5px;
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        text-align: center;
+        white-space: nowrap;
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem 0 0 0.25rem;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 0.25rem 0.25rem 0;
+    }
+</style>

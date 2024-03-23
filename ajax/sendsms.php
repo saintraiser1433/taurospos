@@ -73,8 +73,6 @@ var_dump($get_sms_status);
 if($action == 'REJECT'){
     $sqldel = "DELETE FROM tbl_borrower where borrower_id='$id'";
     $conn->query($sqldel);
-
-    
 }
 
 
