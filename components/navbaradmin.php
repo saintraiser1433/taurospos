@@ -4,7 +4,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3 text-muted">
-          <img src="../static/images/seait.png" width="26px" height="26px"> SCIENCE LABORATORY BORROWING SYSTEM
+          <img src="../static/images/logo.png" width="48px" height="48px"> SCIENCE LABORATORY BORROWING SYSTEM
         </h1>
         <div class="navbar-nav flex-row order-md-last">
 

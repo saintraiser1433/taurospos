@@ -3,6 +3,13 @@ if (!isset($_SESSION['admin_id'])) {
   header("Location:../index.php");
 }
 
+if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
+  $stat = $_GET['stat'];
+  $theid = $_GET['catId'];
+  $sql = "UPDATE tbl_category SET status = $stat where category_id=$theid";
+  $conn->query($sql);
+}
+
 ?>
 
 <!doctype html>
@@ -102,9 +109,9 @@ if (!isset($_SESSION['admin_id'])) {
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-green text-white text-uppercase ms-auto">Active</span>';
+                              echo " <a href='?stat=0&catId=".$row['category_id']."'><span class='badge badge-sm bg-green text-white text-uppercase ms-auto'>Active</span></a>";
                             } else if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-red text-white text-uppercase ms-auto">Inactive</span>';
+                              echo " <a href='?stat=1&catId=".$row['category_id']."'><span class='badge badge-sm bg-red text-white text-uppercase ms-auto'>Inactive</span></a>";
                             }
                             ?>
 
@@ -118,15 +125,6 @@ if (!isset($_SESSION['admin_id'])) {
                                 <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
                               </svg>
 
-                            </a> |
-                            <a href="#" class="badge bg-red delete">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M4 7h16" />
-                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                <path d="M10 12l4 4m0 -4l-4 4" />
-                              </svg>
                             </a>
                           </td>
                           <td class="d-none"><?php echo $row['category_id'] ?></td>
@@ -158,10 +156,10 @@ if (!isset($_SESSION['admin_id'])) {
 
 </body>
 <?php include '../dist/xx_close_api_admin.php' ?>
+
 </html>
 
 <script>
-
   $(document).ready(function() {
     let id = 0;
     $(document).on('click', '.add', function() {
@@ -273,45 +271,5 @@ if (!isset($_SESSION['admin_id'])) {
 
 
 
-    $(document).on('click', '.delete', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to delete this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/category.php",
-              data: {
-                id: col1,
-                action: 'DELETE'
-              },
-              success: function(response) {
-                response = JSON.parse(response);
-                if (response.error) {
-                  swal("Error", response.error, "error");
-                } else {
-                  swal(response.success, {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
-
-                }
-              },
-              error: function(xhr, status, error) {
-                swal("Error", error, "error");
-              }
-            });
-          }
-        });
-    });
   });
 </script>

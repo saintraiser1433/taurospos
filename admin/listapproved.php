@@ -252,34 +252,34 @@ if (!isset($_SESSION['admin_id'])) {
       $('#FrontID').attr('src', `../static/front/${col1}.png`)
       $('#BackID').attr('src', `../static/back/${col1}.png`)
 
-      // var currentRow = $(this).closest("tr");
-      // var col1 = currentRow.find("td:eq(0)").text();
-      // swal({
-      //     title: "Are you sure?",
-      //     text: "You want to approved this user?",
-      //     icon: "warning",
-      //     buttons: true,
-      //     dangerMode: true,
-      //   })
-      //   .then((isConfirm) => {
-      //     if (isConfirm) {
-      //       $.ajax({
-      //         method: "POST",
-      //         url: "../ajax/approval.php",
-      //         data: {
-      //           id: col1,
-      //           action: 'UPDATE'
-      //         },
-      //         success: function(html) {
-      //           swal("Success", {
-      //             icon: "success",
-      //           }).then((value) => {
-      //             location.reload();
-      //           });
-      //         }
-      //       });
-      //     }
-      //   });
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(0)").text();
+      swal({
+          title: "Are you sure?",
+          text: "You want to approved this user?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/approval.php",
+              data: {
+                id: col1,
+                action: 'UPDATE'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
+          }
+        });
     });
 
     $(document).on('click', '.delete', function(e) {
@@ -298,7 +298,7 @@ if (!isset($_SESSION['admin_id'])) {
             swal("Successfull rejected", {
               icon: "success",
             }).then((value) => {
-              // sendSMS(col1, 'REJECT');
+              sendSMS(col1, 'REJECT');
               location.reload();
             });
           }

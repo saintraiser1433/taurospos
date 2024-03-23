@@ -36,18 +36,18 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
                 $stmt->execute();
                 echo json_encode(['success' => 'Successfully Update Category']);
                 break;
-            case 'DELETE':
-                $depId = $_POST['id'];
-                $sql = "DELETE FROM tbl_category WHERE category_id=?";
-                $stmt = $conn->prepare($sql);
-                if (!$stmt) {
-                    echo json_encode(['error' => $conn->error]);
-                    break;
-                }
-                $stmt->bind_param("i", $depId);
-                $stmt->execute();
-                echo json_encode(['success' => 'Successfully Deleted Category']);
-                break;
+            // case 'STATUS':
+            //     $depId = $_POST['id'];
+            //     $sql = "UPDATE tbl_category SET status = 0 WHERE category_id=?";
+            //     $stmt = $conn->prepare($sql);
+            //     if (!$stmt) {
+            //         echo json_encode(['error' => $conn->error]);
+            //         break;
+            //     }
+            //     $stmt->bind_param("i", $depId);
+            //     $stmt->execute();
+            //     echo json_encode(['success' => 'Successfully Deleted Category']);
+            //     break;
             default:
                 echo json_encode(['error' => 'Invalid action']);
                 break;

@@ -3,6 +3,13 @@ include '../connection.php';
 if (!isset($_SESSION['admin_id'])) {
   header("Location:../index.php");
 }
+if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
+  $stat = $_GET['stat'];
+  $theid = $_GET['deptId'];
+  $sql = "UPDATE tbl_department SET status = $stat where department_id=$theid";
+  $conn->query($sql);
+}
+
 
 ?>
 
@@ -103,9 +110,9 @@ if (!isset($_SESSION['admin_id'])) {
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
-                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
+                              echo " <a href='?stat=0&deptId=".$row['department_id']."'><span class='badge badge-sm bg-green text-white text-uppercase ms-auto'>Active</span></a>";
                             } else if ($row['status'] == 0) {
-                              echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
+                              echo " <a href='?stat=1&deptId=".$row['department_id']."'><span class='badge badge-sm bg-red text-white text-uppercase ms-auto'>Inactive</span></a>";
                             }
                             ?>
                           </td>
@@ -118,8 +125,8 @@ if (!isset($_SESSION['admin_id'])) {
                                 <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
                               </svg>
 
-                            </a> |
-                            <a href="#" class="badge bg-red delete">
+                            </a> 
+                            <!-- <a href="#" class="badge bg-red delete">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M4 7h16" />
@@ -127,7 +134,7 @@ if (!isset($_SESSION['admin_id'])) {
                                 <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                                 <path d="M10 12l4 4m0 -4l-4 4" />
                               </svg>
-                            </a>
+                            </a> -->
                           </td>
                           <td class="d-none"><?php echo $row['department_id'] ?></td>
                           <td class="d-none"><?php echo $row['status'] ?></td>
@@ -268,45 +275,45 @@ if (!isset($_SESSION['admin_id'])) {
 
 
 
-    $(document).on('click', '.delete', function(e) {
-      e.preventDefault();
-      var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(4)").text();
-      swal({
-          title: "Are you sure?",
-          text: "You want to delete this data?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((isConfirm) => {
-          if (isConfirm) {
-            $.ajax({
-              method: "POST",
-              url: "../ajax/department.php",
-              data: {
-                id: col1,
-                action: 'DELETE'
-              },
-              success: function(response) {
-                response = JSON.parse(response);
-                if (response.error) {
-                  swal("Error", response.error, "error");
-                } else {
-                  swal(response.success, {
-                    icon: "success",
-                  }).then((value) => {
-                    location.reload();
-                  });
+    // $(document).on('click', '.delete', function(e) {
+    //   e.preventDefault();
+    //   var currentRow = $(this).closest("tr");
+    //   var col1 = currentRow.find("td:eq(4)").text();
+    //   swal({
+    //       title: "Are you sure?",
+    //       text: "You want to delete this data?",
+    //       icon: "warning",
+    //       buttons: true,
+    //       dangerMode: true,
+    //     })
+    //     .then((isConfirm) => {
+    //       if (isConfirm) {
+    //         $.ajax({
+    //           method: "POST",
+    //           url: "../ajax/department.php",
+    //           data: {
+    //             id: col1,
+    //             action: 'DELETE'
+    //           },
+    //           success: function(response) {
+    //             response = JSON.parse(response);
+    //             if (response.error) {
+    //               swal("Error", response.error, "error");
+    //             } else {
+    //               swal(response.success, {
+    //                 icon: "success",
+    //               }).then((value) => {
+    //                 location.reload();
+    //               });
 
-                }
-              },
-              error: function(xhr, status, error) {
-                swal("Error", error, "error");
-              }
-            });
-          }
-        });
-    });
+    //             }
+    //           },
+    //           error: function(xhr, status, error) {
+    //             swal("Error", error, "error");
+    //           }
+    //         });
+    //       }
+    //     });
+    // });
   });
 </script>
