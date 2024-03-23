@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         switch ($action) {
             case 'ADD':
                 $description = $_POST['description'];
-                $sql = "INSERT INTO tbl_department (department_names) VALUES (?)";
+                $sql = "INSERT INTO tbl_department (department_name) VALUES (?)";
                 $stmt = $conn->prepare($sql);
                 if (!$stmt) {
                     echo json_encode(['error' => $conn->error]);

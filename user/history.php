@@ -40,7 +40,7 @@ if (!isset($_SESSION['borrower_id'])) {
       <div class="page-body">
         <div class="container-xl">
           <div class="card">
-          <div class="card-status-bottom bg-success"></div>
+            <div class="card-status-bottom bg-success"></div>
             <div class="card-body">
               <div id="listjs">
                 <div class="d-flex align-items-center justify-content-between">
@@ -197,19 +197,10 @@ if (!isset($_SESSION['borrower_id'])) {
   <?php include '../components/script.php' ?>
 
 </body>
+<?php include '../dist/xx_close_api_user.php' ?>
 
 </html>
 <script>
-  $(window).bind('unload', function() {
-    $.ajax({
-      url: "../ajax/setUpdate.php",
-      method: "GET",
-      data: {
-        type: 2,
-        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
-      },
-    });
-  });
   $(document).ready(function() {
 
     function getDetails(data) {

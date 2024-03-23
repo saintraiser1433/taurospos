@@ -127,20 +127,11 @@ if (!isset($_GET['code'])) {
   <?php include '../components/script.php' ?>
 
 </body>
+<?php include '../dist/xx_close_api_user.php' ?>
 
 </html>
 
 <script>
-  $(window).bind('unload', function() {
-    $.ajax({
-      url: "../ajax/setUpdate.php",
-      method: "GET",
-      data: {
-        type: 2,
-        borrowid: '<?php echo $_SESSION['borrower_id'] ?>'
-      },
-    });
-  });
   let counter = parseInt($('#counter').val());
 
   $(document).on('click', '#add', function() {
