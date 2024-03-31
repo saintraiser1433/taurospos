@@ -3,7 +3,6 @@
 //   header("Location:../index.php");
 // }
 
-$trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 ?>
 
 <!doctype html>
@@ -28,7 +27,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                 Overview
               </div>
               <h2 class="page-title">
-                Inventory Panel
+                Discount Panel
               </h2>
             </div>
             <!-- Page title actions -->
@@ -41,7 +40,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new item
+                  Create new discount
                 </a>
               </div>
             </div>
@@ -68,31 +67,23 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                     <thead>
                       <tr>
                         <th>
-                          Img
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-inventory">
-                            Item Code
+                          <button class="table-sort" data-sort="sort-id">
+                            #
                           </button>
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-inventory">
-                            Item Name
+                            Discount Name
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Description
+                          <button class="table-sort" data-sort="sort-inventory">
+                            Discount Percentage
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Category
-                          </button>
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Price
+                          <button class="table-sort" data-sort="sort-inventory">
+                            Points
                           </button>
                         </th>
                         <th>
@@ -100,40 +91,27 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                             Status
                           </button>
                         </th>
+
                         <th>
                           <button class="table-sort">
                             Action
                           </button>
                         </th>
+                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT
-                      a.item_code,
-                      b.category_name,
-                      a.item_name,
-                      a.price,
-                      a.status,
-                      a.description,
-                      a.img_path
-                  FROM
-                      tbl_inventory a
-                  LEFT JOIN tbl_category b ON
-                      a.category_id = b.category_id
-                  ORDER BY
-                      a.date_created ASC";
+                      $sql = "SELECT * FROM tbl_discount order by date_created asc";
                       $rs = $conn->query($sql);
                       $i = 1;
+
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td><img src="../static/item/<?php echo $row['img_path'] ?>" class="rounded-circle" style="width:30px;height:30px;"></td>
-                          <td class="sort-id"><?php echo $row['item_code'] ?></td>
-
-                          <td class="sort-inventory text-capitalize"><?php echo $row['item_name'] ?></td>
-                          <td class="sort-inventory text-capitalize text-justify w-25"><?php echo $row['description'] ?></td>
-                          <td class="sort-inventory"><?php echo $row['category_name'] ?></td>
-                          <td class="sort-inventory"><?php echo $row['price'] ?></td>
+                          <td><?php echo $i++ ?></td>
+                          <td class="sort-id text-capitalize"><?php echo $row['discount_name'] ?></td>
+                          <td class="sort-id"><?php echo $row['discount_percent'] ?>%</td>
+                          <td class="sort-id"><?php echo $row['points'] ?></td>
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
@@ -163,7 +141,9 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                                 <path d="M10 12l4 4m0 -4l-4 4" />
                               </svg>
                             </a>
+
                           </td>
+                          <td class="d-none"><?php echo $row['discount_id'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
@@ -191,41 +171,127 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 </html>
 
 <script>
-  function readURL(input) {
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $('#ImgID').attr('src', e.target.result);
-
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
-
-
-
   $(document).ready(function() {
     let id = null;
+
+
     $(document).on('click', '.add', function() {
-      window.location.href = "ae-item.php";
+      $('#modal-discount').modal('show');
+      id = null;
+      $('.xxDiscount').html('Insert Discount');
+      $('#discountName').val('');
+      $('#percentage').val('');
+      $('#points').val('');
+      $('.my-switch').css('display', 'none');
     });
 
     $(document).on('click', '.edit', function() {
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(1)").text();
-      window.location.href = "ae-item.php?ac=" + col1;
+      var col1 = currentRow.find("td:eq(6)").text();
+      id = col1;
+      $('#modal-discount').modal('show');
+      $('.xxDiscount').html('Update Discount');
+      $.ajax({
+        method: "GET",
+        url: "../ajax/server-discount.php",
+        data: {
+          id: col1,
+        },
+        dataType: 'json',
+        success: function(res) {
+          const html = res[0];
+          if (html.status != 0) {
+            stat = 'checked'
+          } else {
+            stat = ''
+          }
+          $('#discountName').val(html.discount_name);
+          $('#percentage').val(html.discount_percent);
+          $('#points').val(html.points);
+          $('.my-switch').css('display', 'block');
+          $('#discountStatus').prop('checked', stat);
+        }
+      });
+
     });
 
+    $(document).on('click', '#submit', function(e) {
+      e.preventDefault();
+      let title;
+      let discountName = $('#discountName').val();
+      let percentage = $('#percentage').val();
+      let points = $('#points').val();
+      var status = $('#discountStatus').prop('checked');
+      if (status) {
+        checkStatus = 1;
+      } else {
+        checkStatus = 0;
+      }
+      if (id === null) {
+        title = "You want to add this data?";
+      } else {
+        title = "You want to update this data?";
+      }
 
-
+      swal({
+          title: "Are you sure?",
+          text: title,
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            if (id === null) {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/server-discount.php",
+                data: {
+                  discountName: discountName,
+                  percentage: percentage,
+                  points: points,
+                  action: 'ADD'
+                },
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            } else {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/server-discount.php",
+                data: {
+                  id: id,
+                  discountName: discountName,
+                  percentage: percentage,
+                  points: points,
+                  status: checkStatus,
+                  action: 'UPDATE'
+                },
+                success: function(html) {
+                  swal("Successfully Updated", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            }
+          }
+        });
+    });
 
     $(document).on('click', '.delete', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(1)").text();
+      var col1 = currentRow.find("td:eq(6)").text();
       swal({
           title: "Are you sure?",
-          text: "You want to delete this item?",
+          text: "You want to delete this discount?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -234,9 +300,9 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/server-inventory.php",
+              url: "../ajax/server-discount.php",
               data: {
-                assetcode: col1,
+                id: col1,
                 action: 'DELETE'
               },
               success: function(html) {
@@ -251,5 +317,8 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
           }
         });
     });
+
+
+
   });
 </script>

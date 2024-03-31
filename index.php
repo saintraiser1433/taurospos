@@ -4,23 +4,19 @@ include 'connection.php';
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    if (isset($_GET['us3r']) == 'admin') {
-        $sql = "SELECT * FROM tbl_admin where username='$username' and password='$password'";
+    if (isset($_GET['us3r']) == 'personnel') {
+        $sql = "SELECT * FROM tbl_auth where username='$username' and password='$password'";
         $rs = $conn->query($sql);
         if ($rs->num_rows > 0) {
             $row = $rs->fetch_assoc();
-            if ($row['login_session'] == 1) {
-                $_SESSION['response'] = 'Existing Active Session';
-                $_SESSION['type'] = 'warning';
-            } else {
-                $admin = $row['admin_id'];
-                $_SESSION['admin_id'] = $row['admin_id'];
-                $updateSql = "UPDATE tbl_admin SET login_session = 1 where admin_id='$admin'";
-                $conn->query($updateSql);
-                header("Location:admin/index.php");
-                
+            $role = $row['role'];
+            if ($role == 'Admin') {
+                $_SESSION['admin_id'] = $row['auth_id'];
+                header("Location:admin/items.php");
+            } else if ($role == 'Staff') {
+                $_SESSION['staff_id'] = $row['auth_id'];
+                header("Location:staff/index.php");
             }
-          
         } else {
             $_SESSION['response'] = "Incorrect Credentials";
             $_SESSION['type'] = "error";
@@ -30,25 +26,12 @@ if (isset($_POST['submit'])) {
         $rs = $conn->query($sql);
         $row = $rs->fetch_assoc();
         if ($rs->num_rows > 0) {
-            if ($row['status_approval'] == 0) {
-                $_SESSION['response'] = 'Your account is waiting for approval kindly wait for the message from administrator for your status';
-                $_SESSION['type'] = 'info';
-            } else if ($row['status'] == 0) {
-                $_SESSION['response'] = 'Your account is In-active kindly contact the administrator regarding in your account';
-                $_SESSION['type'] = 'warning';
-            } else {
-                if ($row['login_session'] == 1) {
-                    $_SESSION['response'] = 'Existing Active Session';
-                    $_SESSION['type'] = 'warning';
-                } else {
-                    $borrow = $row['borrower_id'];
-                    $_SESSION['name'] = $row['last_name'] . ", " . $row['first_name'];
-                    $_SESSION['borrower_id'] = $row['borrower_id'];
-                    $updateSql = "UPDATE tbl_borrower SET login_session = 1 where borrower_id='$borrow'";
-                    $conn->query($updateSql);
-                    header("Location:user/index.php");
-                }
-            }
+            $borrow = $row['borrower_id'];
+            $_SESSION['name'] = $row['last_name'] . ", " . $row['first_name'];
+            $_SESSION['borrower_id'] = $row['borrower_id'];
+            $updateSql = "UPDATE tbl_borrower SET login_session = 1 where borrower_id='$borrow'";
+            $conn->query($updateSql);
+            header("Location:user/index.php");
         } else {
             $_SESSION['response'] = "Incorrect Credentials";
             $_SESSION['type'] = "error";
@@ -77,7 +60,17 @@ include 'components/indexheader.php'
             </div>
             <div class="card card-md">
                 <div class="card-body">
-                    <h2 class="h2 text-center mb-4">Login to your account</h2>
+                    <h2 class="h2 text-center mb-4">
+                        <?php
+                        if (isset($_GET['us3r']) == 'personnel') {
+                            echo 'Sign in as Personnel';
+                        } else {
+                            echo 'Sign in as User';
+                        }
+
+                        ?>
+
+                    </h2>
                     <form action="" method="post" autocomplete="off" novalidate>
                         <div class="mb-3">
                             <label class="form-label">Username</label>
@@ -116,10 +109,10 @@ include 'components/indexheader.php'
                             <a href="signup.php">No account? Registered Here!</a>
 
                             <?php
-                            if (isset($_GET['us3r']) == 'admin') {
+                            if (isset($_GET['us3r']) == 'personnel') {
                                 echo '<a href="index.php">Login as user</a>';
                             } else {
-                                echo '<a href="?us3r=admin">Login as admin</a>';
+                                echo '<a href="?us3r=personnel">Login as personnel</a>';
                             }
 
                             ?>

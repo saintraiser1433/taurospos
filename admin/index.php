@@ -1,8 +1,6 @@
 <?php
 include '../connection.php';
-if (!isset($_SESSION['admin_id'])) {
-    header("Location:../index.php");
-}
+
 
 $date = date('Y');
 $sql = "SELECT COUNT(*) AS cnt,MONTHNAME(date_created) as borrow from tbl_transaction_header where YEAR(date_created)='$date'";

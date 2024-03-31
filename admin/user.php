@@ -3,7 +3,6 @@
 //   header("Location:../index.php");
 // }
 
-$trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 ?>
 
 <!doctype html>
@@ -28,7 +27,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                 Overview
               </div>
               <h2 class="page-title">
-                Inventory Panel
+                User Panel
               </h2>
             </div>
             <!-- Page title actions -->
@@ -41,7 +40,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new item
+                  Create new user
                 </a>
               </div>
             </div>
@@ -68,31 +67,28 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                     <thead>
                       <tr>
                         <th>
-                          Img
-                        </th>
-                        <th>
-                          <button class="table-sort" data-sort="sort-inventory">
-                            Item Code
+                          <button class="table-sort" data-sort="sort-id">
+                            #
                           </button>
                         </th>
                         <th>
                           <button class="table-sort" data-sort="sort-inventory">
-                            Item Name
+                            Name
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Description
+                          <button class="table-sort" data-sort="sort-inventory">
+                            Address
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Category
+                          <button class="table-sort" data-sort="sort-inventory">
+                            Age
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-status">
-                            Price
+                          <button class="table-sort" data-sort="sort-inventory">
+                            Phone
                           </button>
                         </th>
                         <th>
@@ -101,39 +97,43 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                           </button>
                         </th>
                         <th>
+                          <button class="table-sort" data-sort="sort-inventory">
+                            Username
+                          </button>
+                        </th>
+                        <th>
                           <button class="table-sort">
                             Action
                           </button>
                         </th>
+                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
                       $sql = "SELECT
-                      a.item_code,
-                      b.category_name,
-                      a.item_name,
-                      a.price,
-                      a.status,
-                      a.description,
-                      a.img_path
-                  FROM
-                      tbl_inventory a
-                  LEFT JOIN tbl_category b ON
-                      a.category_id = b.category_id
-                  ORDER BY
-                      a.date_created ASC";
+                      CONCAT(last_name, ' ', first_name,' ',LEFT(middle_name, 1),'.') AS fname,
+                      address,
+                      phone,
+                      STATUS as status,
+                      username,
+                      age,
+                      password,
+                      customer_id
+                    FROM
+                        tbl_customers
+                    ORDER BY
+                        date_created ASC";
                       $rs = $conn->query($sql);
                       $i = 1;
+
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td><img src="../static/item/<?php echo $row['img_path'] ?>" class="rounded-circle" style="width:30px;height:30px;"></td>
-                          <td class="sort-id"><?php echo $row['item_code'] ?></td>
-
-                          <td class="sort-inventory text-capitalize"><?php echo $row['item_name'] ?></td>
-                          <td class="sort-inventory text-capitalize text-justify w-25"><?php echo $row['description'] ?></td>
-                          <td class="sort-inventory"><?php echo $row['category_name'] ?></td>
-                          <td class="sort-inventory"><?php echo $row['price'] ?></td>
+                          <td><?php echo $i++ ?></td>
+                          <td class="sort-id text-capitalize"><?php echo $row['fname'] ?></td>
+                          <td class="sort-id w-25"><?php echo $row['address'] ?></td>
+                          <td class="sort-id"><?php echo $row['age'] ?></td>
+                          <td class="sort-id"><?php echo $row['phone'] ?></td>
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
@@ -144,6 +144,7 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                             ?>
 
                           </td>
+                          <td class="sort-id"><?php echo $row['username'] ?></td>
                           <td>
                             <a href="#" class="badge bg-yellow edit">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -163,14 +164,16 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
                                 <path d="M10 12l4 4m0 -4l-4 4" />
                               </svg>
                             </a>
+
                           </td>
+                          <td class="d-none"><?php echo $row['customer_id'] ?></td>
                         </tr>
                       <?php } ?>
                     </tbody>
                   </table>
                   <br>
                   <div class="btn-toolbar">
-                    <p class="mb-0" id="listjs-showing-items-label">Showing <?php echo $rs->num_rows ?> items</p>
+                    <p class="mb-0" id="listjs-showing-items-label">Showing 0 items</p>
                     <ul class="pagination ms-auto mb-0"></ul>
                   </div>
                 </div>
@@ -191,41 +194,165 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
 </html>
 
 <script>
-  function readURL(input) {
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $('#ImgID').attr('src', e.target.result);
-
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
-
-
-
   $(document).ready(function() {
     let id = null;
+
+
     $(document).on('click', '.add', function() {
-      window.location.href = "ae-item.php";
+      $('#modal-user').modal('show');
+      id = null;
+      $('.xxUser').html('Insert User');
+      $('#firstname').val('');
+      $('#lastname').val('');
+      $('#middlename').val('');
+      $('#age').val('');
+      $('#phonenumber').val('');
+      $('#username').val('');
+      $('#address').val('');
+      $('.my-switch').css('display', 'none');
     });
 
     $(document).on('click', '.edit', function() {
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(1)").text();
-      window.location.href = "ae-item.php?ac=" + col1;
+      var col1 = currentRow.find("td:eq(8)").text();
+      $('#modal-user').modal('show');
+      $('.xxUser').html('Update User');
+      $.ajax({
+        method: "GET",
+        url: "../ajax/server-user.php",
+        data: {
+          id: col1,
+        },
+        dataType: 'json',
+        success: function(res) {
+          const html = res[0];
+          if (html.status != 0) {
+            stat = 'checked'
+          } else {
+            stat = ''
+          }
+          id = col1;
+          var words = html.phone.substring(3);
+          $('#firstname').val(html.first_name);
+          $('#lastname').val(html.last_name);
+          $('#middlename').val(html.middle_name);
+          $('#age').val(html.age);
+          $('#phonenumber').val(words);
+          $('#username').val(html.username);
+          $('#address').val(html.address);
+          $('.my-switch').css('display', 'block');
+          $('#status').prop('checked', stat);
+        }
+      });
+
     });
 
+    $(document).on('click', '#submit', function(e) {
+      e.preventDefault();
+      let title;
+      let firstname = $('#firstname').val();
+      let lastname = $('#lastname').val();
+      let middlename = $('#middlename').val();
+      let age = $('#age').val();
+      let phonenumber = $('#phonenumber').val();
+      let username = $('#username').val();
+      let address = $('#address').val();
+      let status = $('#status').prop('checked');
+      if (id === null) {
+        title = "You want to add this data?";
+      } else {
+        title = "You want to update this data?";
+      }
 
+      if (status) {
+        checkStatus = 1;
+      } else {
+        checkStatus = 0;
+      }
+      swal({
+          title: "Are you sure?",
+          text: title,
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            if (id === null) {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/server-user.php",
+                data: {
+                  firstname: firstname,
+                  lastname: lastname,
+                  middlename: middlename,
+                  age: age,
+                  phonenumber: phonenumber,
+                  username: username,
+                  address: address,
+                  action: 'ADD'
+                },
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            } else {
+              $.ajax({
+                method: "POST",
+                url: "../ajax/server-user.php",
+                data: {
+                  firstname: firstname,
+                  lastname: lastname,
+                  middlename: middlename,
+                  age: age,
+                  phonenumber: phonenumber,
+                  username: username,
+                  address: address,
+                  id: id,
+                  status: checkStatus,
+                  action: 'UPDATE'
+                },
+                success: function(html) {
+                  swal("Successfully Updated", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
+                }
+              });
+            }
+          }
+        });
+    });
 
+    $('#firstname, #lastname').on('keyup', function() {
+      var firstname = $('#firstname').val();
+      var lastname = $('#lastname').val();
+
+      var result = "";
+
+      if (lastname.length > 0) {
+        result += lastname + "_";
+      }
+
+      if (firstname.length > 0) {
+        result += firstname.substring(0, 4);
+      }
+
+      $('#username').val(result + <?php echo date('s') ?>);
+    });
 
     $(document).on('click', '.delete', function(e) {
       e.preventDefault();
       var currentRow = $(this).closest("tr");
-      var col1 = currentRow.find("td:eq(1)").text();
+      var col1 = currentRow.find("td:eq(8)").text();
       swal({
           title: "Are you sure?",
-          text: "You want to delete this item?",
+          text: "You want to remove this user?",
           icon: "warning",
           buttons: true,
           dangerMode: true,
@@ -234,9 +361,9 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
           if (isConfirm) {
             $.ajax({
               method: "POST",
-              url: "../ajax/server-inventory.php",
+              url: "../ajax/server-user.php",
               data: {
-                assetcode: col1,
+                id: col1,
                 action: 'DELETE'
               },
               success: function(html) {
@@ -251,5 +378,35 @@ $trn = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
           }
         });
     });
+
+
+
   });
 </script>
+
+<style>
+  .input-group {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .input-group .prepend-text {
+    display: flex;
+    align-items: center;
+    /* padding: 0.375rem 0.75rem;*/
+    padding: 5px;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem 0 0 0.25rem;
+  }
+
+  .input-group .form-control {
+    border-radius: 0 0.25rem 0.25rem 0;
+  }
+</style>

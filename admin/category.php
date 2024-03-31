@@ -1,14 +1,7 @@
 <?php include '../connection.php';
-if (!isset($_SESSION['admin_id'])) {
-  header("Location:../index.php");
-}
-
-if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
-  $stat = $_GET['stat'];
-  $theid = $_GET['catId'];
-  $sql = "UPDATE tbl_category SET status = $stat where category_id=$theid";
-  $conn->query($sql);
-}
+// if (!isset($_SESSION['admin_id'])) {
+//   header("Location:../index.php");
+// }
 
 ?>
 
@@ -47,7 +40,7 @@ if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  Create new category
+                  Create new item
                 </a>
               </div>
             </div>
@@ -79,7 +72,7 @@ if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
                           </button>
                         </th>
                         <th>
-                          <button class="table-sort" data-sort="sort-category">
+                          <button class="table-sort" data-sort="sort-inventory">
                             Category Name
                           </button>
                         </th>
@@ -88,30 +81,31 @@ if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
                             Status
                           </button>
                         </th>
+
                         <th>
                           <button class="table-sort">
                             Action
                           </button>
                         </th>
                         <th class="d-none"></th>
-                        <th class="d-none"></th>
                       </tr>
                     </thead>
                     <tbody class="table-tbody">
                       <?php
-                      $sql = "SELECT * from tbl_category order by category_id asc";
+                      $sql = "SELECT * FROM tbl_category order by date_created asc";
                       $rs = $conn->query($sql);
                       $i = 1;
+
                       foreach ($rs as $row) { ?>
                         <tr>
-                          <td class="sort-id"><?php echo $i++ ?></td>
-                          <td class="sort-category text-capitalize"><?php echo $row['category_name'] ?></td>
+                          <td><?php echo $i++ ?></td>
+                          <td class="sort-id"><?php echo $row['category_name'] ?></td>
                           <td class="sort-status">
                             <?php
                             if ($row['status'] == 1) {
-                              echo " <a href='?stat=0&catId=".$row['category_id']."'><span class='badge badge-sm bg-green text-white text-uppercase ms-auto'>Active</span></a>";
+                              echo '<span class="badge badge-sm bg-green text-uppercase ms-auto text-white">Active</span>';
                             } else if ($row['status'] == 0) {
-                              echo " <a href='?stat=1&catId=".$row['category_id']."'><span class='badge badge-sm bg-red text-white text-uppercase ms-auto'>Inactive</span></a>";
+                              echo '<span class="badge badge-sm bg-red text-uppercase ms-auto text-white">Inactive</span>';
                             }
                             ?>
 
@@ -125,20 +119,26 @@ if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
                                 <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
                               </svg>
 
+                            </a> |
+                            <a href="#" class="badge bg-red delete">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M4 7h16" />
+                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                <path d="M10 12l4 4m0 -4l-4 4" />
+                              </svg>
                             </a>
+
                           </td>
                           <td class="d-none"><?php echo $row['category_id'] ?></td>
-                          <td class="d-none"><?php echo $row['status'] ?></td>
                         </tr>
-
                       <?php } ?>
-
-
                     </tbody>
                   </table>
                   <br>
                   <div class="btn-toolbar">
-                    <p class="mb-0" id="listjs-showing-items-label">Showing 0 items</p>
+                    <p class="mb-0" id="listjs-showing-items-label">Showing <?php echo $rs->num_rows ?> items</p>
                     <ul class="pagination ms-auto mb-0"></ul>
                   </div>
                 </div>
@@ -155,45 +155,63 @@ if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
   <?php include '../components/script.php' ?>
 
 </body>
-<?php include '../dist/xx_close_api_admin.php' ?>
 
 </html>
 
 <script>
   $(document).ready(function() {
-    let id = 0;
+    let id = null;
+
+
     $(document).on('click', '.add', function() {
       $('#modal-category').modal('show');
+      id = null;
+      $('.xxCategory').html('Insert Category');
       $('#categoryName').val('');
-      $('.md-title').html('Insert Category');
       $('.my-switch').css('display', 'none');
     });
 
     $(document).on('click', '.edit', function() {
+      var currentRow = $(this).closest("tr");
       let stat = '';
       $tr = $(this).closest('tr');
       var data = $tr.children("td").map(function() {
         return $(this).text();
       }).get();
-      if (data[5] == 1) {
-        stat = 'checked'
-      } else {
-        stat = ''
-      }
       id = data[4];
       $('#modal-category').modal('show');
-      $('#categoryName').val(data[1])
-      $('.md-title').html('Update Category');
       $('.my-switch').css('display', 'block');
-      $('#categoryStatus').prop('checked', stat);
+      $('.xxCategory').html('Update Category');
+      $.ajax({
+        method: "GET",
+        url: "../ajax/server-category.php",
+        data: {
+          id: id,
+        },
+        dataType: 'json',
+        success: function(res) {
+          const html = res[0];
+          if (html.status != 0) {
+            stat = 'checked'
+          } else {
+            stat = ''
+          }
+          $('#categoryName').val(html.category_name)
+          $('#categoryStatus').prop('checked', stat);
+        }
+      });
+
     });
-
-
 
     $(document).on('click', '#submit', function(e) {
       e.preventDefault();
-      let checkStatus = 0;
-      var description = $('#categoryName').val();
+      let title;
+      let categoryName = $('#categoryName').val();
+      if (id === null) {
+        title = "You want to add this data?";
+      } else {
+        title = "You want to update this data?";
+      }
       var status = $('#categoryStatus').prop('checked');
       if (status) {
         checkStatus = 1;
@@ -202,68 +220,80 @@ if (isset($_GET['stat']) && isset($_GET['stat']) != '') {
       }
       swal({
           title: "Are you sure?",
-          text: "You want to add this data?",
+          text: title,
           icon: "warning",
           buttons: true,
           dangerMode: true,
         })
         .then((isConfirm) => {
           if (isConfirm) {
-            if (id === 0) {
+            if (id === null) {
               $.ajax({
                 method: "POST",
-                url: "../ajax/category.php",
+                url: "../ajax/server-category.php",
                 data: {
-                  description: description,
+                  categoryName: categoryName,
                   action: 'ADD'
                 },
-                success: function(response) {
-                  response = JSON.parse(response);
-                  if (response.error) {
-                    swal("Error", response.error, "error");
-                  } else {
-                    swal(response.success, {
-                      icon: "success",
-                    }).then((value) => {
-                      location.reload();
-                    });
-
-                  }
-                },
-                error: function(xhr, status, error) {
-                  swal("Error", error, "error");
+                success: function(html) {
+                  swal("Success", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
                 }
               });
-
-
             } else {
               $.ajax({
                 method: "POST",
-                url: "../ajax/category.php",
+                url: "../ajax/server-category.php",
                 data: {
                   id: id,
-                  description: description,
+                  categoryName: categoryName,
                   status: checkStatus,
                   action: 'UPDATE'
                 },
-                success: function(response) {
-                  response = JSON.parse(response);
-                  if (response.error) {
-                    swal("Error", response.error, "error");
-                  } else {
-                    swal(response.success, {
-                      icon: "success",
-                    }).then((value) => {
-                      location.reload();
-                    });
-
-                  }
-                },
-                error: function(xhr, status, error) {
-                  swal("Error", error, "error");
+                success: function(html) {
+                  swal("Successfully Updated", {
+                    icon: "success",
+                  }).then((value) => {
+                    location.reload();
+                  });
                 }
               });
             }
+          }
+        });
+    });
+
+    $(document).on('click', '.delete', function(e) {
+      e.preventDefault();
+      var currentRow = $(this).closest("tr");
+      var col1 = currentRow.find("td:eq(4)").text();
+      swal({
+          title: "Are you sure?",
+          text: "You want to delete this category?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((isConfirm) => {
+          if (isConfirm) {
+            $.ajax({
+              method: "POST",
+              url: "../ajax/server-category.php",
+              data: {
+                id: col1,
+                action: 'DELETE'
+              },
+              success: function(html) {
+                swal("Success", {
+                  icon: "success",
+                }).then((value) => {
+                  location.reload();
+                });
+              }
+            });
 
           }
         });

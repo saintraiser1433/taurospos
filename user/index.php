@@ -1,8 +1,6 @@
 <?php
 include '../connection.php';
-if (!isset($_SESSION['borrower_id'])) {
-  header("Location:../index.php");
-}
+
 
 ?>
 
@@ -11,7 +9,7 @@ if (!isset($_SESSION['borrower_id'])) {
 <html lang="en">
 <?php include '../components/head.php' ?>
 
-<body class=" layout-fluid">
+<body class="layout-fluid">
 
   <div class="page">
     <!-- Navbar -->
@@ -28,160 +26,121 @@ if (!isset($_SESSION['borrower_id'])) {
                 Overview
               </div>
               <h2 class="page-title">
-                List of Items For Borrow
+                My Transaction
               </h2>
             </div>
 
           </div>
         </div>
       </div>
-
-        <!-- Page body -->
-        <div class="page-body">
-          <div class="container-xl">
-            <div class="row">
-
-              <div class="card">
-                <div class="card-status-bottom bg-success"></div>
-                <div class="card-header">
-
-                  <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
-                    <li class="nav-item">
-                      <a href="#all" class="nav-link active" data-bs-toggle="tab">All</a>
-                    </li>
-                    <?php
-                    $sql = "SELECT * FROM tbl_category order by category_id";
-                    $rs = $conn->query($sql);
-                    foreach ($rs as $row) { ?>
-                      <li class="nav-item">
-                        <a href="#<?php echo str_replace(' ', '', $row['category_name']) ?>" class="nav-link text-capitalize" data-bs-toggle="tab"><?php echo $row['category_name'] ?></a>
-                      </li>
-                    <?php } ?>
-                  </ul>
-                </div>
-                <div class="card-body">
-                  <div class="tab-content">
-                    <div class="tab-pane active show" id="all">
-                      <div class="row" id="cardContainer">
-                        <?php
-                        $sqls = "SELECT
-                                      a.item_code,
-                                      a.item_name,
-                                      a.img_path,
-                                      a.quantity,
-                                      b.category_name,
-                                      a.description
-                                  FROM
-                                      tbl_item a
-                                  LEFT JOIN tbl_category b ON
-                                      a.category_id = b.category_id
-                                  LEFT JOIN tbl_size c ON
-                                      a.size_id = c.size_id
-                                  WHERE a.status=1
-                                  ORDER BY
-                                      a.date_created ASC";
-                        $rss = $conn->query($sqls);
-                        foreach ($rss as $rows) { ?>
-                          <div class="col-lg-2 pb-2">
-
-                            <div class="card card-link card-link-pop" onclick="window.location.href='borrowslip.php?code=<?php echo $rows['item_code'] ?>'" style="cursor:pointer">
-
-                              <?php
-                              if ($rows['quantity'] === '0') {
-
-                                echo "
-                                
-                                <div class='ribbon bg-danger'> Out of Stock </div>";
-                              } else {
-                                echo "<div class='ribbon bg-success'> Qty : " . $rows['quantity'] . "</div>";
-                              }
-                              ?>
-                              <div class="card-status-bottom bg-success"></div>
-                              <!-- Photo -->
-                              <div class="img-responsive img-responsive-16x9 card-img-top" style="background-image: url('../static/item/<?php echo $rows['img_path'] ?>')"></div>
-                              <div class="card-body">
-                                <span class="text-capitalize fw-bolder asname"><?php echo $rows['item_name'] ?></span>
-                                <p class="text-muted asdes"><?php echo $rows['description'] ?></p>
-
-                              </div>
-                            </div>
-                          </div>
-
-                        <?php } ?>
-                      </div>
-                    </div>
-                    <?php
-                    foreach ($rs as $rowx) { ?>
-                      <!-- <div class="tab-pane fade active show" id="tabs-home-8"> -->
-                      <div class="tab-pane fade show" id="<?php echo str_replace(' ', '', $rowx['category_name']) ?>">
-                        <div class="row">
-                          <?php
-                          $catid = $rowx['category_id'];
-                          $sql = "SELECT
-                          a.item_code,
-                          a.item_name,
-                          a.img_path,
-                          a.quantity,
-                          b.category_name,
-                          a.description
-                      FROM
-                          tbl_item a
-                      LEFT JOIN tbl_category b ON
-                          a.category_id = b.category_id
-                      LEFT JOIN tbl_size c ON
-                          a.size_id = c.size_id
-                      WHERE a.status=1 and a.category_id=$catid
-                      ORDER BY
-                          a.date_created ASC";
-                          $rst = $conn->query($sql);
-                          foreach ($rst as $rowt) { ?>
-                            <div class="col-lg-2 pb-2">
-
-                              <div class="card card-link card-link-pop" onclick="window.location.href='borrowslip.php?code=<?php echo $rowt['item_code'] ?>'" style="cursor:pointer">
-                                <?php
-                                if ($rowt['quantity'] === '0') {
-                                  echo "<div class='ribbon bg-danger'> Out of Stock </div>";
-                                } else {
-                                  echo "<div class='ribbon bg-success'> Qty : " . $rowt['quantity'] . "</div>";
-                                }
-                                ?>
-                                <div class="card-status-bottom bg-success"></div>
-                                <!-- Photo -->
-                                <div class="img-responsive img-responsive-4x3 card-img-top" style="background-image: url('../static/item/<?php echo $rowt['img_path'] ?>')"></div>
-                                <div class="card-body">
-                                  <span class="text-capitalize fw-bolder"><?php echo $rowt['item_name'] ?></span>
-                                  <p class="text-muted"><?php echo $rowt['description'] ?></p>
-                                </div>
-                              </div>
-                            </div>
-
-                          <?php } ?>
-                        </div>
-                      </div>
-                    <?php
-                    } ?>
+      <!-- Page body -->
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="card">
+            <div class="card-status-bottom bg-success"></div>
+            <div class="card-body">
+              <div id="listjs">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div></div>
+                  <div class="flex-shrink-0">
+                    <input class="form-control listjs-search" id="search-input" placeholder="Search" style="max-width: 200px;" />
                   </div>
                 </div>
+                <br>
+                <div id="pagination-container"></div>
+                <div id="table-default" class="table-responsive">
+                  <table class="table" id="tables">
+                    <thead>
+                      <tr>
+                        <th>
+                          <button class="table-sort" data-sort="sort-id">
+                            Transaction No #
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Date Created
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Total Amount
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Payment Method
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort" data-sort="sort-status">
+                            Payment Status
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort">
+                            Received Status
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort">
+                            Transact By
+                          </button>
+                        </th>
+                        <th>
+                          <button class="table-sort">
+                            Action
+                          </button>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-tbody">
+
+                      <tr>
+                        <td class="sort-id"></td>
+                        <td class="sort-department text-capitalize"></td>
+                        <td class="sort-department text-capitalize">
+
+                        </td>
+                        <td>
+                          <a href="#" class="badge bg-primary details text-decoration-none" title="View Details">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-details" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                              <path d="M11.999 3l.001 17" />
+                              <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
+                            </svg>
+                          </a>
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+                  <br>
+                  <div class="btn-toolbar">
+                    <p class="mb-0" id="listjs-showing-items-label">Showing 0 items</p>
+                    <ul class="pagination ms-auto mb-0"></ul>
+                  </div>
+                </div>
+
               </div>
             </div>
-
           </div>
         </div>
-
-
-
-
-
       </div>
       <?php include '../components/footer.php' ?>
     </div>
-    <?php include '../components/modal.php' ?>
+  </div>
+  <?php include '../components/modal.php' ?>
 
-    <?php include '../components/script.php' ?>
+  <?php include '../components/script.php' ?>
 
 </body>
-<?php include '../dist/xx_close_api_user.php' ?>
+
 </html>
 <script>
+  $(document).ready(function() {
 
+
+
+  });
 </script>
